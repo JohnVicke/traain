@@ -1,5 +1,5 @@
 {
-  "name": "@acme/nextjs",
+  "name": "@traain/nextjs",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -13,11 +13,11 @@
     "with-env": "dotenv -e ../../.env --"
   },
   "dependencies": {
-    "@acme/api": "^0.1.0",
-    "@acme/auth": "^0.1.0",
-    "@acme/db": "^0.1.0",
-    "@acme/tailwind-config": "^0.1.0",
     "@tanstack/react-query": "^4.29.2",
+    "@traain/api": "^0.1.0",
+    "@traain/auth": "^0.1.0",
+    "@traain/db": "^0.1.0",
+    "@traain/tailwind-config": "^0.1.0",
     "@trpc/client": "^10.20.0",
     "@trpc/next": "^10.20.0",
     "@trpc/react-query": "^10.20.0",
@@ -30,7 +30,7 @@
     "zod": "^3.21.4"
   },
   "devDependencies": {
-    "@acme/eslint-config": "^0.1.0",
+    "@traain/eslint-config": "^0.1.0",
     "@types/node": "^18.15.11",
     "@types/react": "^18.0.35",
     "@types/react-dom": "^18.0.11",

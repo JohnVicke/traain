@@ -40,6 +40,8 @@ const CreatePostForm: React.FC = () => {
     },
   });
 
+  const aiMutate = api.workout.create.useMutation();
+
   return (
     <div className="flex w-full max-w-2xl flex-col p-4">
       <input
@@ -74,6 +76,14 @@ const CreatePostForm: React.FC = () => {
         }}
       >
         Create
+      </button>
+      <button
+        className="rounded bg-pink-400 p-2 font-bold"
+        onClick={() => {
+          aiMutate.mutate();
+        }}
+      >
+        AiMutate
       </button>
     </div>
   );

@@ -14,7 +14,7 @@ const CreateWorkoutForm: React.FC = () => {
     useState<EquipmentStyle>("fully equipped gym");
 
   const { isLoading, data, mutate, error } = api.workout.create.useMutation({
-    async onSuccess() {
+    onSuccess() {
       setMinutes(0);
       setMuscleGroups([]);
       setEquipmentStyle("none");

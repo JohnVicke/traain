@@ -77,7 +77,7 @@ const CreateWorkoutForm: React.FC = () => {
         muscleGroups:{" "}
         <div className="flex gap-x-2">
           {muscleGroups.map((m) => (
-            <span>{m}</span>
+            <span key={m}>{m}</span>
           ))}
         </div>
         EquipmentStyle: {equipmentStyle}
@@ -98,7 +98,7 @@ const CreateWorkoutForm: React.FC = () => {
       {data && data.length > 0 && (
         <div className="flex flex-col gap-4">
           {data.map((exercise) => (
-            <div className="flex gap-2">
+            <div className="flex gap-2" key={exercise.name}>
               <div>{exercise.name}</div>
               <div>
                 {exercise.sets}x{exercise.reps}

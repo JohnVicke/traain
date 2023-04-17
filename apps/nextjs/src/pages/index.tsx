@@ -2,100 +2,116 @@ import { useState } from "react";
 import type { NextPage } from "next";
 import Head from "next/head";
 
-import { api, type RouterOutputs } from "~/utils/api";
+import { api, type RouterInputs } from "~/utils/api";
 
-const PostCard: React.FC<{
-  post: RouterOutputs["post"]["all"][number];
-  onPostDelete?: () => void;
-}> = ({ post, onPostDelete }) => {
-  return (
-    <div className="flex flex-row rounded-lg bg-white/10 p-4 transition-all hover:scale-[101%]">
-      <div className="flex-grow">
-        <h2 className="text-2xl font-bold text-pink-400">{post.title}</h2>
-        <p className="mt-2 text-sm">{post.content}</p>
-      </div>
-      <div>
-        <span
-          className="cursor-pointer text-sm font-bold uppercase text-pink-400"
-          onClick={onPostDelete}
-        >
-          Delete
-        </span>
-      </div>
-    </div>
-  );
-};
+type MuscleGroups = RouterInputs["workout"]["create"]["muscleGroups"];
+type EquipmentStyle = RouterInputs["workout"]["create"]["equipmentStyle"];
 
-const CreatePostForm: React.FC = () => {
-  const utils = api.useContext();
+const CreateWorkoutForm: React.FC = () => {
+  const [minutes, setMinutes] = useState(0);
+  const [muscleGroups, setMuscleGroups] = useState<MuscleGroups>([]);
+  const [equipmentStyle, setEquipmentStyle] =
+    useState<EquipmentStyle>("fully equipped gym");
 
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
-
-  const { mutate, error } = api.post.create.useMutation({
+  const { isLoading, data, mutate, error } = api.workout.create.useMutation({
     async onSuccess() {
-      setTitle("");
-      setContent("");
-      await utils.post.all.invalidate();
+      setMinutes(0);
+      setMuscleGroups([]);
+      setEquipmentStyle("none");
     },
   });
-
-  const aiMutate = api.workout.create.useMutation();
 
   return (
     <div className="flex w-full max-w-2xl flex-col p-4">
       <input
         className="mb-2 rounded bg-white/10 p-2 text-white"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        placeholder="Title"
+        value={minutes}
+        type="number"
+        onChange={(e) => {
+          if (e.target.value === "") {
+            setMinutes(0);
+          }
+          setMinutes(parseInt(e.target.value, 10));
+        }}
+        placeholder="Minutes"
       />
-      {error?.data?.zodError?.fieldErrors.title && (
+      {error?.data?.zodError?.fieldErrors.minutes && (
         <span className="mb-2 text-red-500">
-          {error.data.zodError.fieldErrors.title}
+          {error.data.zodError.fieldErrors.minutes}
         </span>
       )}
-      <input
+      <select
         className="mb-2 rounded bg-white/10 p-2 text-white"
-        value={content}
-        onChange={(e) => setContent(e.target.value)}
+        multiple
+        onChange={(e) => {
+          console.log(e);
+          setMuscleGroups((prev) => [
+            ...prev,
+            e.target.value as MuscleGroups[number],
+          ]);
+        }}
         placeholder="Content"
-      />
-      {error?.data?.zodError?.fieldErrors.content && (
+      >
+        <option value="chest">Chest</option>
+        <option value="back">Back</option>
+        <option value="triceps">Triceps</option>
+        <option value="biceps">Biceps</option>
+      </select>
+      <select
+        className="mb-2 rounded bg-white/10 p-2 text-white"
+        onChange={(e) => {
+          console.log(e.target.value);
+          setEquipmentStyle(e.target.value as EquipmentStyle);
+        }}
+        placeholder="Content"
+      >
+        <option value="none">None</option>
+        <option value="fully equipped gym">Fully Equipped Gym</option>
+      </select>
+      {error?.data?.zodError?.fieldErrors.muscleGroups && (
         <span className="mb-2 text-red-500">
-          {error.data.zodError.fieldErrors.content}
+          {error.data.zodError.fieldErrors.muscleGroups}
         </span>
       )}
+      <div className="flex flex-col gap-4">
+        muscleGroups:{" "}
+        <div className="flex gap-x-2">
+          {muscleGroups.map((m) => (
+            <span>{m}</span>
+          ))}
+        </div>
+        EquipmentStyle: {equipmentStyle}
+        Minutes: {minutes}
+      </div>
       <button
         className="rounded bg-pink-400 p-2 font-bold"
         onClick={() => {
           mutate({
-            title,
-            content,
+            minutes,
+            muscleGroups,
+            equipmentStyle,
           });
         }}
       >
-        Create
+        {isLoading ? "Creating workout..." : "Create"}
       </button>
-      <button
-        className="rounded bg-pink-400 p-2 font-bold"
-        onClick={() => {
-          aiMutate.mutate();
-        }}
-      >
-        AiMutate
-      </button>
+      {data && data.length > 0 && (
+        <div className="flex flex-col gap-4">
+          {data.map((exercise) => (
+            <div className="flex gap-2">
+              <div>{exercise.name}</div>
+              <div>
+                {exercise.sets}x{exercise.reps}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
 
 const Home: NextPage = () => {
-  const postQuery = api.post.all.useQuery();
-
-  const deletePostMutation = api.post.delete.useMutation({
-    onSettled: () => postQuery.refetch(),
-  });
-
   return (
     <>
       <Head>
@@ -106,34 +122,10 @@ const Home: NextPage = () => {
       <main className="flex h-screen flex-col items-center bg-gradient-to-b from-[#2e026d] to-[#15162c] text-white">
         <div className="container mt-12 flex flex-col items-center justify-center gap-4 px-4 py-8">
           <h1 className="text-5xl font-extrabold tracking-tight sm:text-[5rem]">
-            Create <span className="text-pink-400">T3</span> Turbo
+            tra<span className="text-pink-400">ai</span>n
           </h1>
 
-          <CreatePostForm />
-
-          {postQuery.data ? (
-            <div className="w-full max-w-2xl">
-              {postQuery.data?.length === 0 ? (
-                <span>There are no posts!</span>
-              ) : (
-                <div className="flex h-[40vh] justify-center overflow-y-scroll px-4 text-2xl">
-                  <div className="flex w-full flex-col gap-4">
-                    {postQuery.data?.map((p) => {
-                      return (
-                        <PostCard
-                          key={p.id}
-                          post={p}
-                          onPostDelete={() => deletePostMutation.mutate(p.id)}
-                        />
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-            </div>
-          ) : (
-            <p>Loading...</p>
-          )}
+          <CreateWorkoutForm />
         </div>
       </main>
     </>

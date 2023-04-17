@@ -3,47 +3,9 @@ import {
   OpenAIApi,
   type ChatCompletionRequestMessage,
 } from "openai";
-import { z } from "zod";
 
+import { csvToWorkout } from "./workout-parser";
 import { systemPrompt } from "./workout-system-prompt";
-
-function parseWorkout(workoutString: string) {
-  return workoutString.split("\n").map((exercise) => {
-    const [name, sets, reps] = exercise.split(",");
-    const parsedExercise = exerciseSchema.safeParse({
-      name,
-      sets,
-      reps,
-    });
-
-    return parsedExercise.success ? parsedExercise.data : null;
-  });
-}
-
-const exerciseSchema = z.object({
-  name: z.string(),
-  sets: z.number(),
-  reps: z.string().refine((value) => {
-    if (!value.includes("-")) {
-      return value;
-    }
-    const [min, max] = value.split("-");
-    return Number(min) < Number(max);
-  }),
-});
-
-const workoutSchema = z.object({
-  exercises: z.array(
-    z.object({
-      name: z.string(),
-      sets: z.number(),
-      reps: z.string().refine((value) => {
-        const [min, max] = value.split("-");
-        return Number(min) < Number(max);
-      }),
-    }),
-  ),
-});
 
 export class OpenAiClient {
   private readonly client: OpenAIApi;
@@ -69,12 +31,11 @@ export class OpenAiClient {
     if (!response.data.choices[0]?.message?.content) {
       throw new Error("No choices returned from OpenAI");
     }
-
     const workout = response.data.choices[0].message.content;
     const start = workout.indexOf("$$");
-    const end = workout.lastIndexOf("$$", start + 1);
-    const workoutString = workout.substring(start + 2, end);
-    return parseWorkout(workoutString);
+    const end = workout.lastIndexOf("$$");
+    const workoutString = workout.substring(start, end);
+    return csvToWorkout(workoutString);
   }
 }
 

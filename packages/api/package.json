@@ -13,6 +13,7 @@
   "dependencies": {
     "@traain/auth": "^0.1.0",
     "@traain/db": "^0.1.0",
+    "@traain/openai-client": "^0.1.0",
     "@trpc/client": "^10.20.0",
     "@trpc/server": "^10.20.0",
     "superjson": "1.9.1",

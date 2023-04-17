@@ -26,6 +26,10 @@
     "//#clean": {
       "cache": false
     },
+    "test": {
+      "dependsOn": ["^db:generate"],
+      "cache": false
+    },
     "type-check": {
       "dependsOn": ["^db:generate"],
       "cache": false

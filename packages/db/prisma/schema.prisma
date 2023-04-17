@@ -13,3 +13,18 @@ model Post {
     content String
 }
 
+model Workout {
+    id          String @id @default(cuid())
+    name        String
+    description String?
+    exercises   Exercise[]
+    userId      String
+}
+
+model Exercise {
+    id          String @id @default(cuid())
+    name        String
+    description String?
+    workout     Workout @relation(fields: [workoutId], references: [id])
+    workoutId   String
+}

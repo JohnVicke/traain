@@ -12,7 +12,8 @@
   },
   "dependencies": {
     "@traain/db": "^0.1.0",
-    "openai": "^3.2.1"
+    "openai": "^3.2.1",
+    "zod": "^3.21.4"
   },
   "devDependencies": {
     "@traain/eslint-config": "^0.1.0",

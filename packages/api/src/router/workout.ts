@@ -14,13 +14,14 @@ export const workoutRouter = createTRPCRouter({
         messages: [
           {
             role: "user",
-            content: "hello world",
+            content:
+              "1. Chest, triceps, biceps, back, 2. 2 hours, 3. Fully equipped gym",
           },
         ],
       });
       return response;
     } catch (error) {
-      console.error(JSON.stringify(error, null, 2));
+      console.error("Error creating workout", error);
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
       });

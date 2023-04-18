@@ -1,4 +1,7 @@
 import type { ExpoConfig } from "@expo/config";
+import { config } from "dotenv";
+
+config({ path: "../../.env" });
 
 const defineConfig = (): ExpoConfig => ({
   name: "expo",
@@ -7,7 +10,7 @@ const defineConfig = (): ExpoConfig => ({
   version: "1.0.0",
   orientation: "portrait",
   icon: "./assets/icon.png",
-  userInterfaceStyle: "light",
+  userInterfaceStyle: "dark",
   splash: {
     image: "./assets/icon.png",
     resizeMode: "contain",
@@ -28,6 +31,9 @@ const defineConfig = (): ExpoConfig => ({
     },
   },
   extra: {
+    clerk: {
+      publishableKey: process.env.CLERK_PUBLISHABLE_KEY,
+    },
     eas: {
       projectId: "your-project-id",
     },

@@ -32,7 +32,12 @@ export const workoutRouter = createTRPCRouter({
             },
           ],
         });
-        return response;
+        return {
+          muscleGroups: input.muscleGroups,
+          equipmentStyle: input.equipmentStyle,
+          estimatedMinutes: input.minutes,
+          exercises: response,
+        };
       } catch (error) {
         console.error("Error creating workout", error);
         throw new TRPCError({

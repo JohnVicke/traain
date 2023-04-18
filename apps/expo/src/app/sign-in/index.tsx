@@ -4,94 +4,34 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View,
 } from "react-native";
-import { useRouter } from "expo-router";
-import { useSignUp } from "@clerk/clerk-expo";
+import { Link, useRouter } from "expo-router";
+import { useSignIn } from "@clerk/clerk-expo";
 import { Controller, useForm } from "react-hook-form";
 
-type PrepareSignupForm = {
+type SignInForm = {
   emailAddress: string;
   password: string;
 };
 
-type VerifySignupForm = {
-  code: string;
-};
-
-function VerifySignupFlow() {
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<VerifySignupForm>();
-
-  const { signUp, isLoaded, setActive } = useSignUp();
+function SignInFlow() {
   const router = useRouter();
-
-  const onSubmit = handleSubmit(async (data) => {
-    if (!isLoaded) return null;
-    try {
-      const completeSignUp = await signUp.attemptEmailAddressVerification({
-        code: data.code,
-      });
-      await setActive({ session: completeSignUp.createdSessionId });
-      router.push("/");
-    } catch (err) {
-      console.error(JSON.stringify(err, null, 2));
-    }
-  });
-
-  return (
-    <View className="flex h-full flex-col items-center justify-center">
-      <Text className="mb-4 text-2xl font-bold text-white">
-        Check your email
-      </Text>
-      <Text className="mb-4 text-lg text-white">
-        We sent you a verification code to your email address.
-      </Text>
-      <Controller
-        control={control}
-        render={({ field: { onChange, onBlur, value } }) => (
-          <TextInput
-            textContentType="oneTimeCode"
-            onBlur={onBlur}
-            className="mb-2 rounded bg-white/10 p-2 text-white"
-            placeholderTextColor="rgba(255, 255, 255, 0.5)"
-            onChangeText={(value) => onChange(value)}
-            placeholder="12345"
-            value={value}
-          />
-        )}
-        name="code"
-        rules={{ required: true }}
-      />
-      {errors.code && <Text className="text-red-400">This is required.</Text>}
-      <TouchableOpacity onPress={() => void onSubmit()}>
-        <Text className="text-lg font-bold text-white">Verify</Text>
-      </TouchableOpacity>
-    </View>
-  );
-}
-
-function PrepareSignupFlow({
-  setPending,
-}: {
-  setPending: React.Dispatch<React.SetStateAction<boolean>>;
-}) {
-  const { signUp, isLoaded } = useSignUp();
+  const { isLoaded, signIn, setActive } = useSignIn();
   const {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm<PrepareSignupForm>();
+  } = useForm<SignInForm>();
 
   const onSubmit = handleSubmit(async (data) => {
     if (!isLoaded) return null;
     try {
-      await signUp.create(data);
-      await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
-      setPending(true);
+      const completeSignIn = await signIn.create({
+        identifier: data.emailAddress,
+        password: data.password,
+      });
+      await setActive({ session: completeSignIn.createdSessionId });
+      router.replace("/");
     } catch (err) {
       console.error(JSON.stringify(err, null, 2));
     }
@@ -145,23 +85,22 @@ function PrepareSignupFlow({
         className="rounded bg-pink-400 p-2"
         onPress={() => void onSubmit()}
       >
-        <Text className="text-center font-semibold text-white">Sign up</Text>
+        <Text className="text-center font-semibold text-white">Sign in</Text>
       </TouchableOpacity>
+      <Text className="text-center text-white">
+        Don&apos;t have an account?{" "}
+        <Link href="/sign-up">
+          <Text className="text-pink-400">Sign up here</Text>
+        </Link>
+      </Text>
     </>
   );
 }
 
 export default function SignIn() {
-  const [isPendingVerification, setIsPendingVerification] =
-    React.useState(false);
-
   return (
     <KeyboardAvoidingView className="h-full justify-center bg-[#1F104A] p-4">
-      {!isPendingVerification ? (
-        <PrepareSignupFlow setPending={setIsPendingVerification} />
-      ) : (
-        <VerifySignupFlow />
-      )}
+      <SignInFlow />
     </KeyboardAvoidingView>
   );
 }

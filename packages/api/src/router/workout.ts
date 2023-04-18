@@ -5,12 +5,12 @@ import { createOpenAiClient } from "@traain/openai-client/src/openai-client";
 
 import { equipmentStyleSchema } from "../schemas/equipment-style";
 import { muscleGroupSchema } from "../schemas/muscle-group";
-import { createTRPCRouter, publicProcedure } from "../trpc";
+import { createTRPCRouter, protectedProcedure } from "../trpc";
 
 const aiClient = createOpenAiClient();
 
 export const workoutRouter = createTRPCRouter({
-  create: publicProcedure
+  create: protectedProcedure
     .input(
       z.object({
         muscleGroups: z.array(muscleGroupSchema),

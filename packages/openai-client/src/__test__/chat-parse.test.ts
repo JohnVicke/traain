@@ -62,7 +62,6 @@ describe("parseWorkout", () => {
       {
         name: "Dumbbell Hammer Curl",
         sets: 3,
-
         reps: "10-12",
       },
     ]);

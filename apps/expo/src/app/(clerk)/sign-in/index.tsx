@@ -1,8 +1,8 @@
 import React from "react";
-import { Text, TextInput, View } from "react-native";
+import { Text, View } from "react-native";
 import { Link, useRouter } from "expo-router";
 import { useSignIn } from "@clerk/clerk-expo";
-import { Controller, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 
 import { Button } from "~/components/ui/button";
 import { TextInputField } from "~/components/ui/text-inputfield";
@@ -48,6 +48,7 @@ function SignInFlow() {
         name="emailAddress"
         keyboardType="email-address"
         autoComplete="email"
+        autoCapitalize="none"
         placeholder="johndoe@gmail.com"
         rules={{ required: true }}
       />

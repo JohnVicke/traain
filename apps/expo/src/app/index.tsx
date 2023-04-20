@@ -8,7 +8,7 @@ import { SignOutButton } from "~/components/sign-out-button";
 
 export default function Root() {
   return (
-    <SafeAreaView className="bg-[#1F104A]">
+    <SafeAreaView className="bg-slate-900">
       <Stack.Screen options={{ title: "Workout" }} />
       <View className="h-full w-full p-4">
         <Text className="mx-auto pb-2 text-5xl font-bold text-white">

@@ -95,9 +95,9 @@ const CreateWorkoutForm: React.FC = () => {
       >
         {isLoading ? "Creating workout..." : "Create"}
       </button>
-      {data && data.length > 0 && (
+      {data && data.exercises.length > 0 && (
         <div className="flex flex-col gap-4">
-          {data.map((exercise) => (
+          {data.exercises.map((exercise) => (
             <div className="flex gap-2" key={exercise.name}>
               <div>{exercise.name}</div>
               <div>

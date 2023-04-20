@@ -11,7 +11,6 @@ import { Stack } from "expo-router";
 import { FlashList } from "@shopify/flash-list";
 import { MoreVertical } from "lucide-react-native";
 import {
-  Controller,
   useForm,
   type Control,
   type FieldValues,
@@ -86,14 +85,6 @@ function ExerciseCard(props: ExerciseCardProps) {
           <SetRow key={`set-row-${exercise.name}-${index}`} index={index} />
         ))}
       </View>
-    </View>
-  );
-}
-
-function WorkoutSummary() {
-  return (
-    <View className="rounded-lg bg-slate-800 p-4">
-      <Text className="text-md font-bold text-slate-50">Workout name</Text>
     </View>
   );
 }

@@ -28,6 +28,11 @@ export default function Root() {
               {() => <Text className="text-white">Sign in</Text>}
             </Pressable>
           </Link>
+          <Link href="/sign-up" asChild>
+            <Pressable>
+              {() => <Text className="text-white">Sign Up</Text>}
+            </Pressable>
+          </Link>
         </SignedOut>
       </View>
     </SafeAreaView>

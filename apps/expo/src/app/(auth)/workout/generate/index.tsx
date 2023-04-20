@@ -21,6 +21,7 @@ import {
 import { api, type RouterInputs } from "~/utils/api";
 import { PillSelect } from "~/components/ui/pill-select";
 import { TextInputField } from "~/components/ui/text-inputfield";
+import { Loading } from "./loading";
 
 interface ExerciseCardProps {
   exercise: {
@@ -97,13 +98,10 @@ function WorkoutSummary() {
   );
 }
 
-type GenerateWorkoutForm = Omit<
-  RouterInputs["workout"]["create"],
-  "minutes"
-> & { minutes: string };
+type GenerateWorkoutInput = RouterInputs["workout"]["create"];
 
 const muscleGroups: {
-  value: GenerateWorkoutForm["muscleGroups"][number];
+  value: GenerateWorkoutInput["muscleGroups"][number];
   display: string;
 }[] = [
   { value: "legs", display: "Legs" },
@@ -135,7 +133,7 @@ function MuscleGroupSelect<T extends FieldValues>(
 }
 
 const equipmentStyle: {
-  value: GenerateWorkoutForm["equipmentStyle"];
+  value: GenerateWorkoutInput["equipmentStyle"];
   display: string;
 }[] = [
   { value: "none", display: "None" },
@@ -160,19 +158,24 @@ function EquipmentSelect<T extends FieldValues>(
   );
 }
 
+type WorkoutForm = {
+  muscleGroups: typeof muscleGroups;
+  equipmentStyle: (typeof equipmentStyle)[number];
+  minutes: string;
+};
+
 export default function Workout() {
   const { mutate, data, isLoading } = api.workout.create.useMutation();
-  const { control, handleSubmit } = useForm<GenerateWorkoutForm>({
+  const { control, handleSubmit } = useForm<WorkoutForm>({
     defaultValues: {
       muscleGroups: [],
     },
   });
 
   const onSubmit = handleSubmit((data) => {
-    console.log(data);
     mutate({
-      equipmentStyle: data.equipmentStyle,
-      muscleGroups: data.muscleGroups,
+      equipmentStyle: data.equipmentStyle.value,
+      muscleGroups: data.muscleGroups.map((v) => v.value),
       minutes: parseInt(data.minutes, 10),
     });
   });
@@ -180,8 +183,12 @@ export default function Workout() {
   return (
     <SafeAreaView className="bg-slate-900">
       <Stack.Screen options={{ title: "Workout" }} />
-      {data ? (
-        <View className="my-2 h-full w-full">
+      {isLoading ? (
+        <View className="h-full w-full items-center justify-center">
+          <Loading />
+        </View>
+      ) : data ? (
+        <View className="my-2 h-full w-full px-2">
           {data?.exercises && data.exercises.length > 0 && (
             <FlashList
               data={data.exercises}
@@ -193,7 +200,7 @@ export default function Workout() {
           )}
         </View>
       ) : (
-        <KeyboardAvoidingView className="mt-2 h-full w-full">
+        <KeyboardAvoidingView className="mt-2 flex h-full w-full">
           <MuscleGroupSelect control={control} name="muscleGroups" />
           <TextInputField
             control={control}

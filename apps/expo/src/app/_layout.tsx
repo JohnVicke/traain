@@ -1,6 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import React from "react";
+
+import "react-native-reanimated";
+import "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import Constants from "expo-constants";
 import { Stack } from "expo-router";

@@ -11,14 +11,16 @@ import { Stack } from "expo-router";
 import { FlashList } from "@shopify/flash-list";
 import { MoreVertical } from "lucide-react-native";
 import {
-  Control,
   Controller,
-  FieldValues,
-  Path,
   useForm,
+  type Control,
+  type FieldValues,
+  type Path,
 } from "react-hook-form";
 
-import { RouterInputs, api } from "~/utils/api";
+import { api, type RouterInputs } from "~/utils/api";
+import { PillSelect } from "~/components/ui/pill-select";
+import { TextInputField } from "~/components/ui/text-inputfield";
 
 interface ExerciseCardProps {
   exercise: {
@@ -100,14 +102,17 @@ type GenerateWorkoutForm = Omit<
   "minutes"
 > & { minutes: string };
 
-const muscleGroups: GenerateWorkoutForm["muscleGroups"] = [
-  "legs",
-  "back",
-  "core",
-  "shoulders",
-  "biceps",
-  "triceps",
-  "chest",
+const muscleGroups: {
+  value: GenerateWorkoutForm["muscleGroups"][number];
+  display: string;
+}[] = [
+  { value: "legs", display: "Legs" },
+  { value: "back", display: "Back" },
+  { value: "core", display: "Core" },
+  { value: "shoulders", display: "Shoulders" },
+  { value: "biceps", display: "Biceps" },
+  { value: "triceps", display: "Triceps" },
+  { value: "chest", display: "Chest" },
 ];
 
 type MuscleGroupSelectProps<T extends FieldValues> = {
@@ -119,46 +124,22 @@ function MuscleGroupSelect<T extends FieldValues>(
   props: MuscleGroupSelectProps<T>,
 ) {
   return (
-    <Controller
+    <PillSelect
       control={props.control}
       name={props.name}
-      render={({ field: { onChange, value } }) => (
-        <View className="flex flex-row flex-wrap gap-x-4 gap-y-2">
-          {muscleGroups.map((group) => (
-            <TouchableOpacity
-              key={group}
-              className="mb-2 rounded-lg bg-slate-800 p-2"
-              onPress={() => {
-                if (value?.includes(group)) {
-                  onChange(
-                    (
-                      value as unknown as GenerateWorkoutForm["muscleGroups"]
-                    ).filter(
-                      (g: GenerateWorkoutForm["muscleGroups"][number]) =>
-                        g !== group,
-                    ),
-                  );
-                  return;
-                }
-                onChange([...value, group]);
-              }}
-            >
-              {value?.includes(group) ? (
-                <Text className="text-pink-400">{group}</Text>
-              ) : (
-                <Text className="text-slate-50">{group}</Text>
-              )}
-            </TouchableOpacity>
-          ))}
-        </View>
-      )}
+      options={muscleGroups}
+      multiple
+      rules={{ required: true }}
     />
   );
 }
 
-const equipmentStyle: GenerateWorkoutForm["equipmentStyle"][] = [
-  "none",
-  "fully equipped gym",
+const equipmentStyle: {
+  value: GenerateWorkoutForm["equipmentStyle"];
+  display: string;
+}[] = [
+  { value: "none", display: "None" },
+  { value: "fully equipped gym", display: "Fully equipped gym" },
 ];
 
 type EquipmentSelectProps<T extends FieldValues> = {
@@ -170,43 +151,24 @@ function EquipmentSelect<T extends FieldValues>(
   props: EquipmentSelectProps<T>,
 ) {
   return (
-    <Controller
+    <PillSelect
       control={props.control}
       name={props.name}
-      render={({ field: { onChange, value } }) => (
-        <View className="flex flex-row flex-wrap gap-x-4 gap-y-2">
-          {equipmentStyle.map((equipment) => (
-            <TouchableOpacity
-              key={equipment}
-              className="mb-2 rounded-lg bg-slate-800 p-2"
-              onPress={() => onChange(equipment)}
-            >
-              {value === equipment ? (
-                <Text className="text-pink-400">{equipment}</Text>
-              ) : (
-                <Text className="text-slate-50">{equipment}</Text>
-              )}
-            </TouchableOpacity>
-          ))}
-        </View>
-      )}
+      options={equipmentStyle}
+      rules={{ required: true }}
     />
   );
 }
 
 export default function Workout() {
   const { mutate, data, isLoading } = api.workout.create.useMutation();
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<GenerateWorkoutForm>({
+  const { control, handleSubmit } = useForm<GenerateWorkoutForm>({
     defaultValues: {
       muscleGroups: [],
     },
   });
 
-  const onSubmit = handleSubmit(async (data) => {
+  const onSubmit = handleSubmit((data) => {
     console.log(data);
     mutate({
       equipmentStyle: data.equipmentStyle,
@@ -233,34 +195,17 @@ export default function Workout() {
       ) : (
         <KeyboardAvoidingView className="mt-2 h-full w-full">
           <MuscleGroupSelect control={control} name="muscleGroups" />
-          {errors.muscleGroups && (
-            <Text className="text-red-400">This is required.</Text>
-          )}
-          <Controller
+          <TextInputField
             control={control}
-            render={({ field: { onChange, onBlur, value } }) => (
-              <TextInput
-                onBlur={onBlur}
-                placeholder="60"
-                keyboardType="number-pad"
-                className="mb-2 rounded bg-white/10 p-2 text-white"
-                placeholderTextColor="rgba(255, 255, 255, 0.5)"
-                onChangeText={onChange}
-                value={value?.toString()}
-              />
-            )}
             name="minutes"
+            placeholder="60"
+            keyboardType="number-pad"
+            rules={{ required: true }}
           />
-          {errors.minutes && (
-            <Text className="text-red-400">This is required.</Text>
-          )}
           <EquipmentSelect control={control} name="equipmentStyle" />
-          {errors.equipmentStyle && (
-            <Text className="text-red-400">This is required.</Text>
-          )}
           <TouchableOpacity
             className="rounded bg-pink-400 p-2"
-            onPress={onSubmit}
+            onPress={() => void onSubmit()}
           >
             <Text className="text-center font-semibold text-white">
               Generate workout

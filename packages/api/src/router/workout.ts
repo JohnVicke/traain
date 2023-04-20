@@ -6,8 +6,11 @@ import { createOpenAiClient } from "@traain/openai-client/src/openai-client";
 import { equipmentStyleSchema } from "../schemas/equipment-style";
 import { muscleGroupSchema } from "../schemas/muscle-group";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
+import { exampleWorkout } from "./example-workout";
 
 const aiClient = createOpenAiClient();
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export const workoutRouter = createTRPCRouter({
   create: protectedProcedure
@@ -16,9 +19,14 @@ export const workoutRouter = createTRPCRouter({
         muscleGroups: z.array(muscleGroupSchema),
         minutes: z.number().min(1),
         equipmentStyle: equipmentStyleSchema,
+        example: z.boolean().optional(),
       }),
     )
     .mutation(async ({ input }) => {
+      if (input.example) {
+        await sleep(1000);
+        return exampleWorkout;
+      }
       try {
         const hours = Math.floor(input.minutes / 60);
         const content = `1. ${input.muscleGroups.join(

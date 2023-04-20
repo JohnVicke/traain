@@ -22,6 +22,7 @@ type PillSelectProps<
   control: Control<TField>;
   name: Path<TField>;
   multiple?: boolean;
+  className?: string;
   rules?: Omit<
     RegisterOptions<TField, Path<TField>>,
     "valueAsNumber" | "valueAsDate" | "setValueAs" | "disabled"
@@ -95,8 +96,8 @@ export function PillSelect<
                 <Text
                   className={cn(
                     compare(field.value, option)
-                      ? "text-pink-300"
-                      : "text-slate-50",
+                      ? "font-bold text-pink-300"
+                      : "font-normal text-slate-50",
                   )}
                 >
                   {option.display}

@@ -22,7 +22,7 @@ type ButtonVariants = {
 const buttonVariants = cva<ButtonVariants>("rounded items-center", {
   variants: {
     variant: {
-      primary: "bg-teal-300",
+      primary: "bg-slate-50",
       secondary: "bg-gray-300",
     },
     size: {

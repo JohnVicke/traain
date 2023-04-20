@@ -6,9 +6,9 @@ export function Loading() {
     <MotiView
       className="relative h-24 w-24 bg-cyan-300"
       animate={{
-        scale: [1, 1.5, 1.5, 1, 1],
+        scale: [1, 1, 1.2, 1, 1],
         rotate: ["0deg", "180deg", "0deg", "-180deg", "0deg"],
-        borderRadius: ["5%", "50%", "5%", "50%", "10%"],
+        borderRadius: [5, 50, 5, 50, 10],
       }}
       transition={{
         duration: 2,

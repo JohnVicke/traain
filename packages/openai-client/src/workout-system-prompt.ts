@@ -8,7 +8,7 @@ const questions = [
   "What equipment do you have?",
 ];
 
-const answerType = `You will answer in CSV format: {exersice, sets, reps}. Where exerise is a string, set is a number and reps is a string in the format of "min-max" or number. Begin the CSV block with $$ and end with $$`;
+const answerType = `You will answer in CSV format: {exersice, sets, reps, target muscle group}. Where exerise is a string, set is a number and reps is a string in the format of "min-max" or number. Target muscle group is a | separated list of target muscle groups decending in priority. Begin the CSV block with $$ and end with $$`;
 
 export const systemPrompt = {
   role: "system",

@@ -28,6 +28,9 @@ const RootLayout = () => {
                 headerStyle: {
                   backgroundColor: "#111827",
                 },
+                headerTitleStyle: {
+                  color: "rgba(255,255,255,0.2)",
+                },
               }}
             />
             <StatusBar />

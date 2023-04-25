@@ -1,14 +1,12 @@
-import { Text, TouchableOpacity } from "react-native";
 import { useAuth } from "@clerk/clerk-expo";
+
+import { Button } from "./ui/button";
 
 export function SignOutButton() {
   const { signOut } = useAuth();
   return (
-    <TouchableOpacity
-      className="rounded bg-pink-400 p-2"
-      onPress={() => void signOut()}
-    >
-      <Text className="text-center text-white">Sign Out</Text>
-    </TouchableOpacity>
+    <Button variant="outline" onPress={() => void signOut()}>
+      Sign Out
+    </Button>
   );
 }

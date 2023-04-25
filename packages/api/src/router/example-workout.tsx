@@ -24,4 +24,4 @@ export const exampleWorkout = {
       reps: "12-15",
     },
   ],
-} as const;
+};

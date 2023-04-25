@@ -14,17 +14,33 @@ model Post {
 }
 
 model Workout {
-    id          String @id @default(cuid())
+    id          String            @id @default(cuid())
     name        String
+    prompt      String?
     description String?
-    exercises   Exercise[]
+    exercises   WorkoutExercise[]
     userId      String
 }
 
 model Exercise {
-    id          String @id @default(cuid())
-    name        String
-    description String?
-    workout     Workout @relation(fields: [workoutId], references: [id])
-    workoutId   String
+    id              String           @id @default(cuid())
+    name            String
+    muscleGroups    MuscleGroup[]
+    description     String?
+    WorkoutExercise WorkoutExercise?
+}
+
+model MuscleGroup {
+    id         String   @id @default(cuid())
+    name       String
+    exercise   Exercise @relation(fields: [exerciseId], references: [id])
+    exerciseId String
+}
+
+model WorkoutExercise {
+    id         Int      @id @default(autoincrement())
+    exercise   Exercise @relation(fields: [exerciseId], references: [id])
+    exerciseId String   @unique
+    workout    Workout  @relation(fields: [workoutId], references: [id])
+    workoutId  String
 }

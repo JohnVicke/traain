@@ -1,8 +1,10 @@
 import {
+  Pressable,
   Text,
   TouchableOpacity,
   type TouchableOpacityProps,
 } from "react-native";
+import { Link } from "expo-router";
 import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "~/utils/cn";
@@ -11,6 +13,7 @@ type ButtonVariants = {
   variant: {
     primary: string;
     secondary: string;
+    outline: string;
   };
   size: {
     sm: string;
@@ -24,6 +27,7 @@ const buttonVariants = cva<ButtonVariants>("rounded items-center", {
     variant: {
       primary: "bg-slate-50",
       secondary: "bg-gray-300",
+      outline: "border-slate-50 border",
     },
     size: {
       sm: "px-2 py-1",
@@ -42,6 +46,7 @@ const textVariants = cva<ButtonVariants>("font-bold", {
     variant: {
       primary: "text-slate-950",
       secondary: "text-black",
+      outline: "text-slate-50",
     },
     size: {
       sm: "text-sm",
@@ -50,17 +55,52 @@ const textVariants = cva<ButtonVariants>("font-bold", {
     },
   },
   defaultVariants: {
+    size: "md",
     variant: "primary",
   },
 });
 
-type ButtonProps = TouchableOpacityProps & VariantProps<typeof buttonVariants>;
+type ButtonProps = TouchableOpacityProps &
+  VariantProps<typeof buttonVariants> &
+  (DefaultButtonProps | LinkButtonProps);
+
+type DefaultButtonProps = {
+  asLink?: false;
+  href?: never;
+};
+
+type LinkButtonProps = {
+  asLink: true;
+  href: string;
+};
 
 export function Button(props: ButtonProps) {
-  const { children, variant, size, ...touchableOpacityProps } = props;
+  const {
+    children,
+    variant,
+    size,
+    asLink,
+    href,
+    className,
+    ...touchableOpacityProps
+  } = props;
+
+  if (asLink) {
+    return (
+      <Link href={href} asChild>
+        <Pressable className={cn(className, buttonVariants({ variant, size }))}>
+          {() => (
+            <Text className={cn(textVariants({ variant, size }))}>
+              {children}
+            </Text>
+          )}
+        </Pressable>
+      </Link>
+    );
+  }
   return (
     <TouchableOpacity
-      className={cn(buttonVariants({ variant, size }))}
+      className={cn(className, buttonVariants({ variant, size }))}
       {...touchableOpacityProps}
     >
       <Text className={cn(textVariants({ variant, size }))}>{children}</Text>

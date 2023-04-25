@@ -14,19 +14,25 @@ const exerciseSchema = z.object({
       const [min, max] = value.split("-");
       return Number(min) < Number(max) ? value : false;
     }),
+  muscleGroups: z.preprocess((value) => {
+    return (value as string)
+      .split("|")
+      .map((group) => group.trim().toLowerCase());
+  }, z.array(z.string())),
 });
 
 export function csvToWorkout(workoutString: string) {
   return workoutString
     .substring(2, workoutString.length - 2)
-    .replaceAll('"', "")
     .split("\n")
     .map((exercise) => {
-      const [name, sets, reps] = exercise.split(",");
+      if (!exercise) return null;
+      const [name, sets, reps, muscleGroups] = exercise.split(",");
       const parsedExercise = exerciseSchema.safeParse({
         name,
         sets,
         reps,
+        muscleGroups,
       });
 
       return parsedExercise.success ? parsedExercise.data : null;

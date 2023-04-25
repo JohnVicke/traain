@@ -32,6 +32,7 @@ export class OpenAiClient {
       throw new Error("No choices returned from OpenAI");
     }
     const workout = response.data.choices[0].message.content;
+    console.log({ workout });
     const start = workout.indexOf("$$");
     const end = workout.lastIndexOf("$$");
     const workoutString = workout.substring(start, end);

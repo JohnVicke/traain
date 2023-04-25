@@ -4,11 +4,11 @@ import { MotiView } from "moti";
 export function Loading() {
   return (
     <MotiView
-      className="relative h-24 w-24 bg-cyan-300"
+      className="relative h-24 w-24 bg-slate-800/80"
       animate={{
         scale: [1, 1, 1.2, 1, 1],
-        rotate: ["0deg", "180deg", "0deg", "-180deg", "0deg"],
-        borderRadius: [5, 50, 5, 50, 10],
+        rotate: ["0deg", "180deg", "360deg", "540deg", "720deg"],
+        borderRadius: [5, 50, 50, 50, 10],
       }}
       transition={{
         duration: 2,

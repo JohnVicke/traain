@@ -1,9 +1,11 @@
-import React, { useEffect } from "react";
-import { View } from "react-native";
+import React from "react";
+import { Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Stack } from "expo-router";
+import { Stack, useRouter } from "expo-router";
+import { Picker } from "@react-native-picker/picker";
 import { AnimatePresence } from "moti";
 import {
+  Controller,
   useForm,
   type Control,
   type FieldValues,
@@ -14,9 +16,7 @@ import { api, type RouterInputs } from "~/utils/api";
 import { KeyboardAvoidView } from "~/components/keyboard-avoid-view";
 import { Button } from "~/components/ui/button";
 import { PillSelect } from "~/components/ui/pill-select";
-import { TextInputField } from "~/components/ui/text-inputfield";
 import { Loading } from "./loading";
-import { WorkoutList } from "./workout-list";
 
 type GenerateWorkoutInput = RouterInputs["workout"]["create"];
 
@@ -47,6 +47,7 @@ function MuscleGroupSelect<T extends FieldValues>(
       {...props}
       options={muscleGroups}
       multiple
+      itemWidth="29%"
       rules={{ required: true }}
     />
   );
@@ -57,7 +58,7 @@ const equipmentStyle: {
   display: string;
 }[] = [
   { value: "none", display: "None" },
-  { value: "fully equipped gym", display: "Fully equipped gym" },
+  { value: "fully equipped gym", display: "Fully Equipped Gym" },
 ];
 
 type EquipmentSelectProps<T extends FieldValues> = {
@@ -72,6 +73,7 @@ function EquipmentSelect<T extends FieldValues>(
   return (
     <PillSelect
       {...props}
+      itemWidth="45%"
       options={equipmentStyle}
       rules={{ required: true }}
     />
@@ -85,33 +87,29 @@ type WorkoutForm = {
 };
 
 export default function Workout() {
-  const { mutate, data, isLoading } = api.workout.create.useMutation();
+  const router = useRouter();
+  const { mutate, data, isLoading } = api.workout.create.useMutation({
+    onSuccess(workout) {
+      router.push(`/workout/${workout.id}`);
+    },
+  });
   const { control, handleSubmit } = useForm<WorkoutForm>({
     defaultValues: {
+      minutes: "60",
       muscleGroups: [],
     },
   });
-
-  useEffect(() => {
-    mutate({
-      example: true,
-      muscleGroups: ["chest", "triceps"],
-      minutes: 60,
-      equipmentStyle: "fully equipped gym",
-    });
-  }, []);
 
   const onSubmit = handleSubmit((data) => {
     mutate({
       equipmentStyle: data.equipmentStyle.value,
       muscleGroups: data.muscleGroups.map((v) => v.value),
       minutes: parseInt(data.minutes, 10),
-      example: true,
     });
   });
 
   return (
-    <SafeAreaView className="bg-slate-900 px-4">
+    <>
       <Stack.Screen options={{ title: "Workout" }} />
       <AnimatePresence exitBeforeEnter>
         {isLoading ? (
@@ -119,18 +117,22 @@ export default function Workout() {
             <Loading />
           </View>
         ) : data?.exercises && data.exercises.length > 0 ? (
-          <WorkoutList workout={data} />
+          <View>
+            <Text>success</Text>
+          </View>
         ) : (
-          <KeyboardAvoidView className="mt-2 flex h-full w-full">
+          <KeyboardAvoidView className="flex h-full w-full">
+            <Text className="mb-2 text-xs text-slate-200/60">
+              Choose target muscle groups:
+            </Text>
             <MuscleGroupSelect control={control} name="muscleGroups" />
-            <TextInputField
-              className="my-4"
-              control={control}
-              name="minutes"
-              placeholder="60"
-              keyboardType="number-pad"
-              rules={{ required: true }}
-            />
+            <Text className="mb-2 mt-4 text-xs text-slate-200/60">
+              For how Long will you work out?
+            </Text>
+            <TimePicker control={control} name="minutes" />
+            <Text className="mb-2 mt-4 text-xs text-slate-200/60">
+              What equipment do you have access to?
+            </Text>
             <EquipmentSelect control={control} name="equipmentStyle" />
             <Button className="mt-4" onPress={() => void onSubmit()}>
               Generate workout
@@ -138,6 +140,48 @@ export default function Workout() {
           </KeyboardAvoidView>
         )}
       </AnimatePresence>
-    </SafeAreaView>
+    </>
+  );
+}
+
+type TimePickerProps<T extends FieldValues> = {
+  control: Control<T>;
+  name: Path<T>;
+};
+
+const selectedColor = "#e2e8f0";
+const selectionColor = "#334155";
+
+function TimePicker<T extends FieldValues>(props: TimePickerProps<T>) {
+  const { control, name } = props;
+  return (
+    <Controller
+      control={control}
+      name={name}
+      render={({ field: { value, onChange } }) => (
+        <Picker selectedValue={value} onValueChange={onChange} mode="dialog">
+          <Picker.Item
+            color={value === "45" ? selectedColor : selectionColor}
+            value="45"
+            label="45 min"
+          />
+          <Picker.Item
+            color={value === "60" ? selectedColor : selectionColor}
+            value="60"
+            label="60 min"
+          />
+          <Picker.Item
+            color={value === "90" ? selectedColor : selectionColor}
+            value="90"
+            label="90 min"
+          />
+          <Picker.Item
+            color={value === "120" ? selectedColor : selectionColor}
+            value="120"
+            label="120 min"
+          />
+        </Picker>
+      )}
+    />
   );
 }

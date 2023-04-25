@@ -6,63 +6,36 @@ describe("parseWorkout", () => {
   it("parses a workout", () => {
     const csv =
       "$$\n" +
-      '"Flat Bench Press", 4, "8-12"\n' +
-      '"Incline Dumbbell Fly", 3, "10-15"\n' +
-      '"Tricep Pushdown", 3, "12-15"\n' +
-      '"Barbell Curl", 3, "8-12"\n' +
-      '"Seated Cable Row", 4, "8-12"\n' +
-      '"Lat Pulldown", 3, "10-15"\n' +
-      '"Inverted Row", 3, "10-12"\n' +
-      '"Cable Bicep Curl", 3, "12-15"\n' +
-      '"Dumbbell Hammer Curl", 3, "10-12"\n' +
+      "Bench press, 4, 8-10, chest|triceps\n" +
+      "Incline dumbbell press, 3, 10-12, chest\n" +
+      "Cable tricep pushdown, 3, 12-15, triceps\n" +
+      "Close grip bench press, 3, 8-10, triceps|chest\n" +
       "$$";
     const result = csvToWorkout(csv);
     expect(result).toEqual([
       {
-        name: "Flat Bench Press",
+        name: "Bench press",
         sets: 4,
-        reps: "8-12",
+        reps: "8-10",
+        muscleGroups: ["chest", "triceps"],
       },
       {
-        name: "Incline Dumbbell Fly",
-        sets: 3,
-        reps: "10-15",
-      },
-      {
-        name: "Tricep Pushdown",
-        sets: 3,
-        reps: "12-15",
-      },
-      {
-        name: "Barbell Curl",
-        sets: 3,
-        reps: "8-12",
-      },
-      {
-        name: "Seated Cable Row",
-        sets: 4,
-
-        reps: "8-12",
-      },
-      {
-        name: "Lat Pulldown",
-        sets: 3,
-        reps: "10-15",
-      },
-      {
-        name: "Inverted Row",
+        name: "Incline dumbbell press",
         sets: 3,
         reps: "10-12",
+        muscleGroups: ["chest"],
       },
       {
-        name: "Cable Bicep Curl",
+        name: "Cable tricep pushdown",
         sets: 3,
         reps: "12-15",
+        muscleGroups: ["triceps"],
       },
       {
-        name: "Dumbbell Hammer Curl",
+        name: "Close grip bench press",
         sets: 3,
-        reps: "10-12",
+        reps: "8-10",
+        muscleGroups: ["triceps", "chest"],
       },
     ]);
   });

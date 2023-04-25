@@ -23,6 +23,7 @@ type PillSelectProps<
   name: Path<TField>;
   multiple?: boolean;
   className?: string;
+  itemWidth?: string;
   rules?: Omit<
     RegisterOptions<TField, Path<TField>>,
     "valueAsNumber" | "valueAsDate" | "setValueAs" | "disabled"
@@ -33,7 +34,7 @@ export function PillSelect<
   TField extends FieldValues,
   TValues extends PillValue[],
 >(props: PillSelectProps<TField, TValues>) {
-  const { control, rules, options, multiple, name } = props;
+  const { control, rules, options, multiple, name, itemWidth } = props;
 
   const handlePress = (
     currentValue: PillValue,
@@ -89,12 +90,16 @@ export function PillSelect<
           <View className="flex-row flex-wrap gap-x-4 gap-y-2">
             {options.map((option) => (
               <TouchableOpacity
-                className="mb-2 rounded-lg bg-slate-800 p-2"
+                style={{
+                  width: itemWidth && itemWidth,
+                }}
+                className="mb-2 w-24 items-center justify-center rounded-lg bg-slate-800 p-2"
                 onPress={() => handlePress(option, field.value, field.onChange)}
                 key={option.value}
               >
                 <Text
                   className={cn(
+                    "text-base",
                     compare(field.value, option)
                       ? "font-bold text-pink-300"
                       : "font-normal text-slate-50",

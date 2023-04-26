@@ -44,8 +44,21 @@ export const workoutRouter = createTRPCRouter({
           exampleWorkout.exercises,
           ctx.prisma,
         );
-        console.log({ res });
-        return { id: 1, ...exampleWorkout };
+        return {
+          id: 1,
+          ...exampleWorkout,
+          exercises: exampleWorkout.exercises.map(
+            ({ muscleGroups, name, reps, sets }) => {
+              return {
+                id: res.find((ex) => ex.name === name)?.id ?? 0,
+                muscleGroups,
+                name,
+                reps,
+                sets,
+              };
+            },
+          ),
+        };
       }
       try {
         const hours = Math.floor(input.minutes / 60);
@@ -69,7 +82,15 @@ export const workoutRouter = createTRPCRouter({
           muscleGroups: input.muscleGroups,
           equipmentStyle: input.equipmentStyle,
           estimatedMinutes: input.minutes,
-          exercises,
+          exercises: exercises.map(({ muscleGroups, name, reps, sets }) => {
+            return {
+              id: res.find((ex) => ex.name === name)?.id ?? 0,
+              muscleGroups,
+              name,
+              reps,
+              sets,
+            };
+          }),
         };
       } catch (error) {
         console.error("Error creating workout", error);

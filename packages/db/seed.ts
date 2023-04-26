@@ -7,7 +7,10 @@ const muscleGroups = [
   { name: "back" },
   { name: "triceps" },
   { name: "biceps" },
-  { name: "legs" },
+  { name: "quadriceps" },
+  { name: "hamstrings" },
+  { name: "calves" },
+  { name: "core" },
   { name: "shoulders" },
 ] as const;
 

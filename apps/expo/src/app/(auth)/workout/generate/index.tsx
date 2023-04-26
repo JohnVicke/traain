@@ -1,11 +1,8 @@
 import React from "react";
 import { Text, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { Stack, useRouter } from "expo-router";
-import { Picker } from "@react-native-picker/picker";
 import { AnimatePresence } from "moti";
 import {
-  Controller,
   useForm,
   type Control,
   type FieldValues,
@@ -15,6 +12,7 @@ import {
 import { api, type RouterInputs } from "~/utils/api";
 import { KeyboardAvoidView } from "~/components/keyboard-avoid-view";
 import { Button } from "~/components/ui/button";
+import { Pickerfield } from "~/components/ui/pickerfield";
 import { PillSelect } from "~/components/ui/pill-select";
 import { Loading } from "./loading";
 
@@ -144,44 +142,33 @@ export default function Workout() {
   );
 }
 
+const timePickerOptions = [
+  {
+    value: "45",
+    label: "45 min",
+  },
+  {
+    value: "60",
+    label: "60 min",
+  },
+  {
+    value: "90",
+    label: "90 min",
+  },
+  {
+    value: "120",
+    label: "120 min",
+  },
+];
+
 type TimePickerProps<T extends FieldValues> = {
   control: Control<T>;
   name: Path<T>;
 };
 
-const selectedColor = "#e2e8f0";
-const selectionColor = "#334155";
-
 function TimePicker<T extends FieldValues>(props: TimePickerProps<T>) {
   const { control, name } = props;
   return (
-    <Controller
-      control={control}
-      name={name}
-      render={({ field: { value, onChange } }) => (
-        <Picker selectedValue={value} onValueChange={onChange} mode="dialog">
-          <Picker.Item
-            color={value === "45" ? selectedColor : selectionColor}
-            value="45"
-            label="45 min"
-          />
-          <Picker.Item
-            color={value === "60" ? selectedColor : selectionColor}
-            value="60"
-            label="60 min"
-          />
-          <Picker.Item
-            color={value === "90" ? selectedColor : selectionColor}
-            value="90"
-            label="90 min"
-          />
-          <Picker.Item
-            color={value === "120" ? selectedColor : selectionColor}
-            value="120"
-            label="120 min"
-          />
-        </Picker>
-      )}
-    />
+    <Pickerfield control={control} name={name} options={timePickerOptions} />
   );
 }

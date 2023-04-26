@@ -15,7 +15,7 @@ const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 export const workoutRouter = createTRPCRouter({
   get: protectedProcedure
     .input(z.object({ id: z.string() }))
-    .query(async ({ input, ctx }) => {
+    .query(async () => {
       /* 
       const workout = await ctx.prisma.workout.findFirst({
         where: { id: input.id },

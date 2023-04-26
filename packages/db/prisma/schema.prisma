@@ -31,10 +31,10 @@ model Exercise {
 }
 
 model MuscleGroup {
-    id         String   @id @default(cuid())
+    id         String    @id @default(cuid())
     name       String
-    exercise   Exercise @relation(fields: [exerciseId], references: [id])
-    exerciseId String
+    exercise   Exercise? @relation(fields: [exerciseId], references: [id])
+    exerciseId String?
 }
 
 model WorkoutExercise {

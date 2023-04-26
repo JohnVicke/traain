@@ -15,8 +15,9 @@ import { Button } from "~/components/ui/button";
 import { Pickerfield } from "~/components/ui/pickerfield";
 import { PillSelect } from "~/components/ui/pill-select";
 import { Loading } from "./loading";
+import { WorkoutListPreview } from "./workout-list-preview";
 
-type GenerateWorkoutInput = RouterInputs["workout"]["create"];
+type GenerateWorkoutInput = RouterInputs["workout"]["generate"];
 
 const muscleGroups: {
   value: GenerateWorkoutInput["muscleGroups"][number];
@@ -86,23 +87,25 @@ type WorkoutForm = {
 
 export default function Workout() {
   const router = useRouter();
-  const { mutate, data, isLoading } = api.workout.create.useMutation({
-    onSuccess(workout) {
-      router.push(`/workout/${workout.id}`);
-    },
-  });
+  const { mutate, data, isLoading } = api.workout.generate.useMutation();
   const { control, handleSubmit } = useForm<WorkoutForm>({
     defaultValues: {
       minutes: "60",
-      muscleGroups: [],
+      muscleGroups: [{ value: "chest", display: "Chest" }],
+      equipmentStyle: { value: "fully equipped gym" },
     },
   });
+
+  const saveAndStartWorkout = (id: number) => {
+    router.push(`/workout/${id}`);
+  };
 
   const onSubmit = handleSubmit((data) => {
     mutate({
       equipmentStyle: data.equipmentStyle.value,
       muscleGroups: data.muscleGroups.map((v) => v.value),
       minutes: parseInt(data.minutes, 10),
+      example: true,
     });
   });
 
@@ -115,9 +118,14 @@ export default function Workout() {
             <Loading />
           </View>
         ) : data?.exercises && data.exercises.length > 0 ? (
-          <View>
-            <Text>success</Text>
-          </View>
+          <>
+            <Button onPress={() => saveAndStartWorkout(data.id)}>
+              Start workout
+            </Button>
+            <View className="mt-4 h-full">
+              <WorkoutListPreview workout={data} />
+            </View>
+          </>
         ) : (
           <KeyboardAvoidView className="flex h-full w-full">
             <Text className="mb-2 text-xs text-slate-200/60">

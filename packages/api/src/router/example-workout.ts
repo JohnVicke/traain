@@ -5,23 +5,27 @@ export const exampleWorkout = {
   exercises: [
     {
       name: "Bench press",
-      sets: 3,
+      sets: 4,
       reps: "8-10",
+      muscleGroups: ["chest", "triceps"],
     },
     {
       name: "Incline dumbbell press",
       sets: 3,
       reps: "10-12",
+      muscleGroups: ["chest"],
     },
     {
-      name: "Cable flys",
+      name: "Cable tricep pushdown",
       sets: 3,
       reps: "12-15",
+      muscleGroups: ["triceps"],
     },
     {
-      name: "Tricep pushdowns",
+      name: "Close grip bench press",
       sets: 3,
-      reps: "12-15",
+      reps: "8-10",
+      muscleGroups: ["triceps", "chest"],
     },
   ],
 };

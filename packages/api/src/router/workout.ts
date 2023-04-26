@@ -1,6 +1,8 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
+import { type MuscleGroup, type prisma } from "@traain/db";
+import { type OpenAiClient } from "@traain/openai-client";
 import { createOpenAiClient } from "@traain/openai-client/src/openai-client";
 
 import { equipmentStyleSchema } from "../schemas/equipment-style";
@@ -13,6 +15,9 @@ const aiClient = createOpenAiClient();
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export const workoutRouter = createTRPCRouter({
+  create: protectedProcedure.mutation(async ({ ctx }) => {
+    return "hello world";
+  }),
   get: protectedProcedure
     .input(z.object({ id: z.string() }))
     .query(async () => {
@@ -24,7 +29,7 @@ export const workoutRouter = createTRPCRouter({
       await sleep(1000);
       return { id: 1, ...exampleWorkout };
     }),
-  create: protectedProcedure
+  generate: protectedProcedure
     .input(
       z.object({
         muscleGroups: z.array(muscleGroupSchema),
@@ -33,9 +38,13 @@ export const workoutRouter = createTRPCRouter({
         example: z.boolean().optional(),
       }),
     )
-    .mutation(async ({ input }) => {
+    .mutation(async ({ ctx, input }) => {
       if (input.example) {
-        await sleep(1000);
+        const res = await createExercisesIfNotExists(
+          exampleWorkout.exercises,
+          ctx.prisma,
+        );
+        console.log({ res });
         return { id: 1, ...exampleWorkout };
       }
       try {
@@ -53,6 +62,8 @@ export const workoutRouter = createTRPCRouter({
           ],
         });
 
+        const res = await createExercisesIfNotExists(exercises, ctx.prisma);
+
         return {
           id: 1,
           muscleGroups: input.muscleGroups,
@@ -68,3 +79,43 @@ export const workoutRouter = createTRPCRouter({
       }
     }),
 });
+
+async function createExercisesIfNotExists(
+  exercises: Awaited<ReturnType<OpenAiClient["complete"]>>,
+  db: typeof prisma,
+) {
+  // Since we have so few muscle groups to select from just query them all at once
+  const muscleGroups = await db.muscleGroup.findMany();
+
+  const muscleGroupMap = new Map<string, MuscleGroup>();
+  for (const muscleGroup of muscleGroups) {
+    muscleGroupMap.set(muscleGroup.name, muscleGroup);
+  }
+
+  const exerciseCreates = exercises.map(async (exercise, index) => {
+    const muscleGroupIds = exercise.muscleGroups.map(
+      (mgName) => muscleGroupMap.get(mgName)?.id,
+    );
+
+    const existingExercise = await db.exercise.findFirst({
+      where: { name: exercise.name },
+    });
+
+    if (existingExercise) return existingExercise;
+
+    return db.exercise.create({
+      data: {
+        name: exercise.name,
+        muscleGroups: {
+          connect: muscleGroupIds.filter(nonNullable).map((id) => ({ id })),
+        },
+      },
+    });
+  });
+
+  return Promise.all(exerciseCreates);
+}
+
+function nonNullable<T>(value: T): value is NonNullable<T> {
+  return value !== null && value !== undefined;
+}

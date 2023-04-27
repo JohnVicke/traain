@@ -18,16 +18,18 @@ model Workout {
     name        String
     prompt      String?
     description String?
+    startTime   DateTime?
+    endTime     DateTime?
     exercises   WorkoutExercise[]
     userId      String
 }
 
 model Exercise {
-    id              String           @id @default(cuid())
+    id              String            @id @default(cuid())
     name            String
     muscleGroups    MuscleGroup[]
     description     String?
-    WorkoutExercise WorkoutExercise?
+    WorkoutExercise WorkoutExercise[]
 }
 
 model MuscleGroup {
@@ -38,9 +40,19 @@ model MuscleGroup {
 }
 
 model WorkoutExercise {
-    id         Int      @id @default(autoincrement())
-    exercise   Exercise @relation(fields: [exerciseId], references: [id])
-    exerciseId String   @unique
-    workout    Workout  @relation(fields: [workoutId], references: [id])
+    id         Int          @id @default(autoincrement())
+    exercise   Exercise     @relation(fields: [exerciseId], references: [id])
+    exerciseId String
+    setHint    String?
+    repHint    String?
+    sets       WorkoutSet[]
+    workout    Workout      @relation(fields: [workoutId], references: [id])
     workoutId  String
+}
+
+model WorkoutSet {
+    id                String           @id @default(cuid())
+    reps              Int
+    WorkoutExercise   WorkoutExercise? @relation(fields: [workoutExerciseId], references: [id])
+    workoutExerciseId Int?
 }

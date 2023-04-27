@@ -1,7 +1,12 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
-import { type MuscleGroup, type prisma } from "@traain/db";
+import {
+  type Exercise,
+  type MuscleGroup,
+  type WorkoutExercise,
+  type prisma,
+} from "@traain/db";
 import { type OpenAiClient } from "@traain/openai-client";
 import { createOpenAiClient } from "@traain/openai-client/src/openai-client";
 
@@ -18,16 +23,22 @@ export const workoutRouter = createTRPCRouter({
   create: protectedProcedure.mutation(async ({ ctx }) => {
     return "hello world";
   }),
+  getAll: protectedProcedure.query(async ({ ctx }) => {
+    return ctx.prisma.workout.findMany({
+      include: { exercises: { include: { exercise: true } } },
+    });
+  }),
   get: protectedProcedure
     .input(z.object({ id: z.string() }))
-    .query(async () => {
-      /* 
+    .query(async ({ input, ctx }) => {
       const workout = await ctx.prisma.workout.findFirst({
         where: { id: input.id },
+        include: { exercises: { include: { exercise: true } } },
       });
-      return workout; */
-      await sleep(1000);
-      return { id: 1, ...exampleWorkout };
+      if (!workout) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+      return workout;
     }),
   generate: protectedProcedure
     .input(
@@ -44,20 +55,22 @@ export const workoutRouter = createTRPCRouter({
           exampleWorkout.exercises,
           ctx.prisma,
         );
+        const enrichedExercises = exampleWorkout.exercises.map((e) =>
+          enrichExercise(e, res.find((ex) => ex.name === e.name)?.id ?? ""),
+        );
+
+        const workout = await createWorkout({
+          db: ctx.prisma,
+          exercises: enrichedExercises,
+          userId: ctx.auth.userId,
+        });
+
+        console.log({ workout });
+
         return {
           id: 1,
           ...exampleWorkout,
-          exercises: exampleWorkout.exercises.map(
-            ({ muscleGroups, name, reps, sets }) => {
-              return {
-                id: res.find((ex) => ex.name === name)?.id ?? 0,
-                muscleGroups,
-                name,
-                reps,
-                sets,
-              };
-            },
-          ),
+          exercises: enrichedExercises,
         };
       }
       try {
@@ -77,20 +90,16 @@ export const workoutRouter = createTRPCRouter({
 
         const res = await createExercisesIfNotExists(exercises, ctx.prisma);
 
+        const enrichedExercises = exercises.map((e) =>
+          enrichExercise(e, res.find((ex) => ex.name === e.name)?.id ?? ""),
+        );
+
         return {
           id: 1,
           muscleGroups: input.muscleGroups,
           equipmentStyle: input.equipmentStyle,
           estimatedMinutes: input.minutes,
-          exercises: exercises.map(({ muscleGroups, name, reps, sets }) => {
-            return {
-              id: res.find((ex) => ex.name === name)?.id ?? 0,
-              muscleGroups,
-              name,
-              reps,
-              sets,
-            };
-          }),
+          exercises: enrichedExercises,
         };
       } catch (error) {
         console.error("Error creating workout", error);
@@ -100,6 +109,41 @@ export const workoutRouter = createTRPCRouter({
       }
     }),
 });
+
+async function createWorkout(options: {
+  exercises: ReturnType<typeof enrichExercise>[];
+  userId: string;
+  db: typeof prisma;
+}) {
+  const { exercises, db, userId } = options;
+
+  const workout = await db.workout.create({
+    data: {
+      name: "Chest & Triceps",
+      userId,
+    },
+  });
+
+  const workoutExercisesCreates = exercises.map((exercise) => {
+    return db.workoutExercise.create({
+      data: {
+        exerciseId: exercise.id,
+        repHint: exercise.reps,
+        setHint: exercise.sets.toString(),
+        workoutId: workout.id,
+      },
+    });
+  });
+
+  const createdExercises = await Promise.all(workoutExercisesCreates);
+
+  return db.workout.update({
+    where: { id: workout.id },
+    data: {
+      exercises: { connect: createdExercises.map(({ id }) => ({ id })) },
+    },
+  });
+}
 
 async function createExercisesIfNotExists(
   exercises: Awaited<ReturnType<OpenAiClient["complete"]>>,
@@ -135,6 +179,16 @@ async function createExercisesIfNotExists(
   });
 
   return Promise.all(exerciseCreates);
+}
+
+function enrichExercise(
+  exercise: Awaited<ReturnType<OpenAiClient["complete"]>>[number],
+  id: string,
+) {
+  return {
+    ...exercise,
+    id,
+  };
 }
 
 function nonNullable<T>(value: T): value is NonNullable<T> {

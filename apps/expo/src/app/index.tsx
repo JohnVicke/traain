@@ -15,6 +15,10 @@ export default function Root() {
       </Text>
       <SignedIn>
         <View className="p-8">
+          <Button asLink href="/workout">
+            Workouts
+          </Button>
+          <View className="my-2" />
           <Button asLink href="/workout/generate">
             Generate workout
           </Button>

@@ -105,6 +105,7 @@ export default function Workout() {
       equipmentStyle: data.equipmentStyle.value,
       muscleGroups: data.muscleGroups.map((v) => v.value),
       minutes: parseInt(data.minutes, 10),
+      example: true,
     });
   });
 

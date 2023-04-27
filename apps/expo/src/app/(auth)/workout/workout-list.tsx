@@ -7,8 +7,10 @@ import { type RouterOutputs } from "@traain/api";
 
 import { KeyboardAvoidView } from "~/components/keyboard-avoid-view";
 
+type WorkoutOutput = RouterOutputs["workout"]["get"];
+
 type WorkoutListProps = {
-  workout: RouterOutputs["workout"]["create"];
+  workout: WorkoutOutput;
 };
 
 export function WorkoutList(props: WorkoutListProps) {
@@ -20,7 +22,7 @@ export function WorkoutList(props: WorkoutListProps) {
         renderItem={({ item, index }) => (
           <ExerciseCard exercise={item} delay={index * 100} />
         )}
-        keyExtractor={(item) => item.name}
+        keyExtractor={(exercise) => exercise.id.toString()}
         estimatedItemSize={200}
         ItemSeparatorComponent={() => <View className="h-4" />}
       />
@@ -30,11 +32,7 @@ export function WorkoutList(props: WorkoutListProps) {
 
 type ExerciseCardProps = {
   delay: number;
-  exercise: {
-    name: string;
-    sets: number;
-    reps: string;
-  };
+  exercise: WorkoutOutput["exercises"][number];
 };
 
 function ExerciseCard(props: ExerciseCardProps) {
@@ -46,19 +44,28 @@ function ExerciseCard(props: ExerciseCardProps) {
       delay={delay}
       className="rounded-lg bg-slate-800 p-4"
     >
-      <Text className="text-md font-bold text-slate-50">{exercise.name}</Text>
+      <Text className="text-md font-bold text-slate-50">
+        {exercise.exercise.name}
+      </Text>
       <View className="my-3 h-px w-full bg-slate-500/50" />
-      <View className="flex">
-        {new Array(exercise.sets).fill(0).map((_, index) => (
-          <SetRow key={`set-row-${exercise.name}-${index}`} index={index} />
-        ))}
-      </View>
+      {exercise.setHint && (
+        <View className="flex">
+          {new Array(parseInt(exercise.setHint, 10)).fill(0).map((_, index) => (
+            <SetRow
+              key={`set-${index}-row-${exercise.id}-${exercise.exercise.id}`}
+              index={exercise.id}
+              repHint={exercise.repHint}
+            />
+          ))}
+        </View>
+      )}
     </MotiView>
   );
 }
 
 type SetRowProps = {
   index: number;
+  repHint: string | null;
 };
 
 function SetRow(props: SetRowProps) {
@@ -90,7 +97,7 @@ function SetRow(props: SetRowProps) {
       <View className="ml-2 flex min-w-[50px]">
         <Text className="text-[10px] text-slate-400">Notes</Text>
         <TextInput
-          placeholder="Notes..."
+          placeholder={props.repHint ?? "Notes..."}
           placeholderTextColor="rgba(255, 255, 255, 0.5)"
           className="rounded p-1 text-white"
           keyboardType="default"

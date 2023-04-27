@@ -1,5 +1,8 @@
 import { Text, View } from "react-native";
+import { TouchableOpacity } from "react-native-gesture-handler";
+import { Link } from "expo-router";
 import { FlashList } from "@shopify/flash-list";
+import { MoreVertical } from "lucide-react-native";
 import { MotiView } from "moti";
 
 import { type RouterOutputs } from "@traain/api";
@@ -39,12 +42,15 @@ function ExercisePreviewCard(props: ExerciseCardProps) {
   const { exercise, delay } = props;
   return (
     <MotiView
-      from={{ translateY: 40, opacity: 0 }}
-      animate={{ translateY: 0, opacity: 1 }}
+      from={{ translateX: 40, opacity: 0 }}
+      animate={{ translateX: 0, opacity: 1 }}
       delay={delay}
       className="bg-slate-800 p-4"
     >
-      <Text className="text-md font-bold text-slate-50">{exercise.name}</Text>
+      <View className="flex flex-row justify-between">
+        <Text className="text-md font-bold text-slate-50">{exercise.name}</Text>
+        <MoreVertical color="white" height={16} />
+      </View>
       <View className="my-3 h-px w-full bg-slate-500/50" />
       <View className="flex">
         <Text className="text-slate-300">Sets: {exercise.sets}</Text>

@@ -17,8 +17,6 @@ import { exampleWorkout } from "./example-workout";
 
 const aiClient = createOpenAiClient();
 
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-
 export const workoutRouter = createTRPCRouter({
   create: protectedProcedure.mutation(async ({ ctx }) => {
     return "hello world";
@@ -33,7 +31,11 @@ export const workoutRouter = createTRPCRouter({
     .query(async ({ input, ctx }) => {
       const workout = await ctx.prisma.workout.findFirst({
         where: { id: input.id },
-        include: { exercises: { include: { exercise: true } } },
+        include: {
+          exercises: {
+            include: { exercise: true, sets: true },
+          },
+        },
       });
       if (!workout) {
         throw new TRPCError({ code: "NOT_FOUND" });
@@ -64,8 +66,6 @@ export const workoutRouter = createTRPCRouter({
           exercises: enrichedExercises,
           userId: ctx.auth.userId,
         });
-
-        console.log({ workout });
 
         return {
           id: 1,
@@ -128,9 +128,14 @@ async function createWorkout(options: {
     return db.workoutExercise.create({
       data: {
         exerciseId: exercise.id,
-        repHint: exercise.reps,
-        setHint: exercise.sets.toString(),
         workoutId: workout.id,
+        sets: {
+          createMany: {
+            data: new Array(exercise.sets)
+              .fill(0)
+              .map(() => ({ notes: `Aim for ${exercise.reps} reps` })),
+          },
+        },
       },
     });
   });

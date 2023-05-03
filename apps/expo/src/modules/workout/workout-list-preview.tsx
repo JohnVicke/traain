@@ -1,6 +1,4 @@
 import { Text, View } from "react-native";
-import { TouchableOpacity } from "react-native-gesture-handler";
-import { Link } from "expo-router";
 import { FlashList } from "@shopify/flash-list";
 import { MoreVertical } from "lucide-react-native";
 import { MotiView } from "moti";

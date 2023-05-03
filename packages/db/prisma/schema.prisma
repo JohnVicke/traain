@@ -25,11 +25,11 @@ model Workout {
 }
 
 model Exercise {
-    id              String            @id @default(cuid())
-    name            String
-    muscleGroups    MuscleGroup[]
-    description     String?
-    WorkoutExercise WorkoutExercise[]
+    id               String            @id @default(cuid())
+    name             String
+    muscleGroups     MuscleGroup[]
+    description      String?
+    workoutExercises WorkoutExercise[]
 }
 
 model MuscleGroup {
@@ -43,8 +43,6 @@ model WorkoutExercise {
     id         Int          @id @default(autoincrement())
     exercise   Exercise     @relation(fields: [exerciseId], references: [id])
     exerciseId String
-    setHint    String?
-    repHint    String?
     sets       WorkoutSet[]
     workout    Workout      @relation(fields: [workoutId], references: [id])
     workoutId  String
@@ -52,7 +50,8 @@ model WorkoutExercise {
 
 model WorkoutSet {
     id                String           @id @default(cuid())
-    reps              Int
+    reps              Int?
+    notes             String?
     WorkoutExercise   WorkoutExercise? @relation(fields: [workoutExerciseId], references: [id])
     workoutExerciseId Int?
 }

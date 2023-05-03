@@ -1,4 +1,6 @@
 import { Text, TextInput, View } from "react-native";
+import { TouchableOpacity } from "react-native-gesture-handler";
+import { Link, useRouter } from "expo-router";
 import { FlashList } from "@shopify/flash-list";
 import { MoreVertical } from "lucide-react-native";
 import { MotiView } from "moti";
@@ -48,29 +50,33 @@ function ExerciseCard(props: ExerciseCardProps) {
         {exercise.exercise.name}
       </Text>
       <View className="my-3 h-px w-full bg-slate-500/50" />
-      {exercise.setHint && (
-        <View className="flex">
-          {new Array(parseInt(exercise.setHint, 10)).fill(0).map((_, index) => (
-            <SetRow
-              key={`set-${index}-row-${exercise.id}-${exercise.exercise.id}`}
-              index={exercise.id}
-              repHint={exercise.repHint}
-            />
-          ))}
-        </View>
-      )}
+      <View className="flex">
+        {exercise.sets.map((set, index) => (
+          <SetRow
+            key={`set-${index}-row-${exercise.id}-${exercise.exercise.id}`}
+            index={index}
+            set={set}
+          />
+        ))}
+      </View>
     </MotiView>
   );
 }
 
 type SetRowProps = {
   index: number;
-  repHint: string | null;
+  set: WorkoutOutput["exercises"][number]["sets"][number];
 };
 
 function SetRow(props: SetRowProps) {
+  const router = useRouter();
   return (
-    <View className="mb-2 flex flex-row items-center">
+    <TouchableOpacity
+      onLongPress={() => {
+        router.push(`/workout/set/${props.set.id}`);
+      }}
+      className="mb-2 flex flex-row items-center"
+    >
       <View className="relative h-6 w-6 items-center justify-center rounded-full bg-slate-500/50 p-2">
         <Text className="absolute text-xs text-slate-200">
           {props.index + 1}
@@ -97,13 +103,20 @@ function SetRow(props: SetRowProps) {
       <View className="ml-2 flex min-w-[50px]">
         <Text className="text-[10px] text-slate-400">Notes</Text>
         <TextInput
-          placeholder={props.repHint ?? "Notes..."}
+          placeholder={props.set.notes ?? ""}
           placeholderTextColor="rgba(255, 255, 255, 0.5)"
           className="rounded p-1 text-white"
           keyboardType="default"
         />
       </View>
-      <MoreVertical className="ml-auto" color="white" height={16} />
-    </View>
+      <Link asChild href={`set/${props.set.id}`}>
+        <MoreVertical
+          className="ml-auto"
+          color="white"
+          width={18}
+          height={18}
+        />
+      </Link>
+    </TouchableOpacity>
   );
 }

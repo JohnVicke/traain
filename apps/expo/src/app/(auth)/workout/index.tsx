@@ -1,8 +1,8 @@
 import { Text, View } from "react-native";
 
 import { api } from "~/utils/api";
+import { LoadingIndicator } from "~/components/loading-indicator";
 import { Button } from "~/components/ui/button";
-import { Loading } from "./generate/loading";
 
 export default function Workouts() {
   const { data, error, isLoading } = api.workout.getAll.useQuery();
@@ -10,7 +10,7 @@ export default function Workouts() {
   if (isLoading) {
     return (
       <View className="h-full w-full items-center justify-center">
-        <Loading />
+        <LoadingIndicator size={70} />
       </View>
     );
   }
@@ -24,7 +24,7 @@ export default function Workouts() {
   }
 
   return (
-    <View className="h-full">
+    <View className="flex h-full bg-slate-900 px-4 pt-24">
       {data.map((workout) => (
         <Button key={workout.id} asLink href={`/workout/${workout.id}`}>
           Go to workout: {workout.id}

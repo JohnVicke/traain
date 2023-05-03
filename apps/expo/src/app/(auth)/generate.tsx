@@ -11,11 +11,11 @@ import {
 
 import { api, type RouterInputs } from "~/utils/api";
 import { KeyboardAvoidView } from "~/components/keyboard-avoid-view";
+import { LoadingIndicator } from "~/components/loading-indicator";
 import { Button } from "~/components/ui/button";
 import { Pickerfield } from "~/components/ui/pickerfield";
 import { PillSelect } from "~/components/ui/pill-select";
-import { Loading } from "./loading";
-import { WorkoutListPreview } from "./workout-list-preview";
+import { WorkoutListPreview } from "~/modules/workout/workout-list-preview";
 
 type GenerateWorkoutInput = RouterInputs["workout"]["generate"];
 
@@ -110,12 +110,12 @@ export default function Workout() {
   });
 
   return (
-    <>
+    <View className="bg-slate-900 px-4 pb-8 pt-12">
       <Stack.Screen options={{ title: "Workout" }} />
       <AnimatePresence exitBeforeEnter>
         {isLoading ? (
           <View className="h-full w-full items-center justify-center">
-            <Loading />
+            <LoadingIndicator size={72} />
           </View>
         ) : data?.exercises && data.exercises.length > 0 ? (
           <>
@@ -146,7 +146,7 @@ export default function Workout() {
           </KeyboardAvoidView>
         )}
       </AnimatePresence>
-    </>
+    </View>
   );
 }
 

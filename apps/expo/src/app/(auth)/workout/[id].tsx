@@ -2,22 +2,18 @@ import { Text, View } from "react-native";
 import { useSearchParams } from "expo-router";
 
 import { api } from "~/utils/api";
-import { Loading } from "./generate/loading";
-import { WorkoutList } from "./workout-list";
+import { LoadingIndicator } from "~/components/loading-indicator";
+import { WorkoutList } from "~/modules/workout/workout-list";
 
 export default function Workout() {
   const { id } = useSearchParams();
-
-  if (typeof id !== "string") {
-    throw new Error("unexpected error");
-  }
 
   const { data, error, isLoading } = api.workout.get.useQuery({ id });
 
   if (isLoading) {
     return (
       <View className="h-full w-full items-center justify-center">
-        <Loading />
+        <LoadingIndicator size={72} />
       </View>
     );
   }
@@ -30,5 +26,9 @@ export default function Workout() {
     );
   }
 
-  return <WorkoutList workout={data} />;
+  return (
+    <View className="bg-slate-900 px-2 pt-8">
+      <WorkoutList workout={data} />
+    </View>
+  );
 }

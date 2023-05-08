@@ -16,7 +16,7 @@ export default function Page() {
   return (
     <div>
       {data.map((workout) => (
-        <div>{JSON.stringify(workout)}</div>
+        <div key={workout.id}>{JSON.stringify(workout)}</div>
       ))}
     </div>
   );

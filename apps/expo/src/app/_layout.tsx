@@ -1,14 +1,14 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import React from "react";
-
-import "react-native-reanimated";
-import "react-native-gesture-handler";
-import { SafeAreaProvider } from "react-native-safe-area-context";
 import Constants from "expo-constants";
-import { Slot, Stack } from "expo-router";
+import { Slot } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { ClerkProvider } from "@clerk/clerk-expo";
+
+import "react-native-gesture-handler";
+import "react-native-reanimated";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { TRPCProvider } from "~/utils/api";
 import { tokenCache } from "~/utils/token-store";

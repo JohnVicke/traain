@@ -16,7 +16,7 @@ export default function Page() {
   return (
     <div>
       {data.map((muscleGroup) => (
-        <div>{JSON.stringify(muscleGroup)}</div>
+        <div key={muscleGroup.id}>{JSON.stringify(muscleGroup)}</div>
       ))}
     </div>
   );

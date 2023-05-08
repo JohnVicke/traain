@@ -50,7 +50,8 @@ model WorkoutExercise {
 
 model WorkoutSet {
     id                String           @id @default(cuid())
-    reps              Int?
+    reps              Float?
+    weight            Float?
     notes             String?
     WorkoutExercise   WorkoutExercise? @relation(fields: [workoutExerciseId], references: [id])
     workoutExerciseId Int?

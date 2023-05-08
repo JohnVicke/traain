@@ -32,4 +32,18 @@ export const workoutSetRouter = createTRPCRouter({
         throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
       }
     }),
+  addSet: protectedProcedure
+    .input(z.object({ id: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      const { id } = input;
+      try {
+        await ctx.prisma.workoutExercise.update({
+          where: { id },
+          data: { sets: { create: {} } },
+        });
+        return true;
+      } catch (err) {
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+      }
+    }),
 });

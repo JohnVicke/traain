@@ -2,11 +2,12 @@ import { useState } from "react";
 import { Text, TextInput, TouchableOpacity, View } from "react-native";
 import { useRouter } from "expo-router";
 import { FlashList } from "@shopify/flash-list";
-import { MoreVertical } from "lucide-react-native";
+import { MoreVertical, PlusSquare } from "lucide-react-native";
 import { MotiView } from "moti";
 
 import { type RouterOutputs } from "@traain/api";
 
+import { api } from "~/utils/api";
 import { KeyboardAvoidView } from "~/components/keyboard-avoid-view";
 import EditSetHalfModal from "./edit-set-half-modal";
 
@@ -39,7 +40,18 @@ type ExerciseCardProps = {
 };
 
 function ExerciseCard(props: ExerciseCardProps) {
+  const utils = api.useContext();
+  const { mutate } = api.workoutSet.addSet.useMutation({
+    onSuccess: () => {
+      void utils.workout.get.invalidate();
+    },
+  });
   const { exercise, delay } = props;
+
+  const handleAddSet = (id: number) => {
+    mutate({ id });
+  };
+
   return (
     <MotiView
       from={{ translateY: 40, opacity: 0 }}
@@ -60,6 +72,14 @@ function ExerciseCard(props: ExerciseCardProps) {
           />
         ))}
       </View>
+      <View className="my-3 h-px w-full bg-slate-500/50" />
+      <TouchableOpacity
+        onPress={() => handleAddSet(exercise.id)}
+        className="flex flex-row items-center space-x-2"
+      >
+        <PlusSquare className="text-slate-200" />
+        <Text className="text-slate-200">Add set</Text>
+      </TouchableOpacity>
     </MotiView>
   );
 }
@@ -110,19 +130,14 @@ function SetRow(props: SetRowProps) {
       <View className="ml-2 flex min-w-[50px]">
         <Text className="text-[10px] text-slate-400">Notes</Text>
         <TextInput
-          placeholder={props.set.notes ?? ""}
+          placeholder={props.set.notes ?? "Add a note..."}
           placeholderTextColor="rgba(255, 255, 255, 0.5)"
           className="rounded p-1 text-white"
           keyboardType="default"
         />
       </View>
-      <TouchableOpacity onPress={handleOpenModal}>
-        <MoreVertical
-          className="ml-auto"
-          color="white"
-          width={18}
-          height={18}
-        />
+      <TouchableOpacity className="ml-auto" onPress={handleOpenModal}>
+        <MoreVertical color="white" width={18} height={18} />
       </TouchableOpacity>
       <EditSetHalfModal
         id={props.set.id}

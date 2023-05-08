@@ -110,7 +110,7 @@ export default function Workout() {
   });
 
   return (
-    <View className="bg-slate-900 px-4 pb-8 pt-12">
+    <View className="px-4 pb-8 pt-12">
       <Stack.Screen options={{ title: "Workout" }} />
       <AnimatePresence exitBeforeEnter>
         {isLoading ? (

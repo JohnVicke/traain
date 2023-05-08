@@ -1,9 +1,5 @@
 import { useState } from "react";
-import { Text, TextInput, View } from "react-native";
-import {
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-} from "react-native-gesture-handler";
+import { Text, TextInput, TouchableOpacity, View } from "react-native";
 import { useRouter } from "expo-router";
 import { FlashList } from "@shopify/flash-list";
 import { MoreVertical } from "lucide-react-native";
@@ -120,14 +116,14 @@ function SetRow(props: SetRowProps) {
           keyboardType="default"
         />
       </View>
-      <TouchableWithoutFeedback onPress={handleOpenModal}>
+      <TouchableOpacity onPress={handleOpenModal}>
         <MoreVertical
           className="ml-auto"
           color="white"
           width={18}
           height={18}
         />
-      </TouchableWithoutFeedback>
+      </TouchableOpacity>
       <EditSetHalfModal
         id={props.set.id}
         open={modalOpen}

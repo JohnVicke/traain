@@ -23,24 +23,27 @@ type ButtonVariants = {
   };
 };
 
-const buttonVariants = cva<ButtonVariants>("rounded items-center", {
-  variants: {
-    variant: {
-      primary: "bg-slate-50",
-      secondary: "bg-gray-300",
-      outline: "border-slate-50 border",
+const buttonVariants = cva<ButtonVariants>(
+  "rounded flex flex-row items-center justify-center",
+  {
+    variants: {
+      variant: {
+        primary: "bg-slate-50",
+        secondary: "bg-gray-300",
+        outline: "border-slate-50 border",
+      },
+      size: {
+        sm: "px-2 py-1",
+        md: "px-4 py-2",
+        lg: "px-6 py-3",
+      },
     },
-    size: {
-      sm: "px-2 py-1",
-      md: "px-4 py-2",
-      lg: "px-6 py-3",
+    defaultVariants: {
+      variant: "primary",
+      size: "md",
     },
   },
-  defaultVariants: {
-    variant: "primary",
-    size: "md",
-  },
-});
+);
 
 const textVariants = cva<ButtonVariants>("font-bold inline-flex", {
   variants: {
@@ -117,7 +120,23 @@ export function Button(props: ButtonProps) {
       className={cn(className, buttonVariants({ variant, size }))}
       {...touchableOpacityProps}
     >
-      <Text className={cn(textVariants({ variant, size }))}>{children}</Text>
+      <>
+        {StartIcon && (
+          <StartIcon className={cn("mr-4", textVariants({ variant, size }))} />
+        )}
+        <Text
+          className={cn(
+            StartIcon && "-ml-2",
+            EndIcon && "-mr-2",
+            textVariants({ variant, size }),
+          )}
+        >
+          {children}
+        </Text>
+        {EndIcon && (
+          <EndIcon className={cn("ml-4", textVariants({ variant, size }))} />
+        )}
+      </>
     </TouchableOpacity>
   );
 }

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { SafeAreaView, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Link, Tabs, usePathname } from "expo-router";
+import { Link, Tabs, usePathname, useSegments } from "expo-router";
 import {
   Cog,
   Dumbbell,
@@ -16,6 +16,9 @@ import { cn } from "~/utils/cn";
 
 const TAB_BAR_ITEM_WIDTH = 72;
 const TAB_BAR_INSET = TAB_BAR_ITEM_WIDTH + 4;
+
+// Include full segment path
+const HIDE_ON_SCREENS = ["(auth)/workout/[id]"];
 
 type NavItem = {
   href: string;
@@ -93,9 +96,11 @@ function TabBar(props: BottomTabBarProps) {
 
 export default function Layout() {
   const pathname = usePathname();
+  const segments = useSegments();
+  const hidden = HIDE_ON_SCREENS.includes(segments.join("/"));
   return (
     <Tabs
-      tabBar={(props) => <TabBar {...props} pathname={pathname} />}
+      tabBar={(props) => !hidden && <TabBar {...props} pathname={pathname} />}
       screenOptions={{ headerShown: false }}
       sceneContainerStyle={{ backgroundColor: "#0f172a" }}
     >

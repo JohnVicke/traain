@@ -1,6 +1,10 @@
+import { useState } from "react";
 import { Text, TextInput, View } from "react-native";
-import { TouchableOpacity } from "react-native-gesture-handler";
-import { Link, useRouter } from "expo-router";
+import {
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+} from "react-native-gesture-handler";
+import { useRouter } from "expo-router";
 import { FlashList } from "@shopify/flash-list";
 import { MoreVertical } from "lucide-react-native";
 import { MotiView } from "moti";
@@ -8,6 +12,7 @@ import { MotiView } from "moti";
 import { type RouterOutputs } from "@traain/api";
 
 import { KeyboardAvoidView } from "~/components/keyboard-avoid-view";
+import EditSetHalfModal from "./edit-set-half-modal";
 
 type WorkoutOutput = RouterOutputs["workout"]["get"];
 
@@ -69,7 +74,13 @@ type SetRowProps = {
 };
 
 function SetRow(props: SetRowProps) {
+  const [modalOpen, setModalOpen] = useState(false);
   const router = useRouter();
+
+  const handleOpenModal = () => {
+    setModalOpen(true);
+  };
+
   return (
     <TouchableOpacity
       onLongPress={() => {
@@ -109,14 +120,19 @@ function SetRow(props: SetRowProps) {
           keyboardType="default"
         />
       </View>
-      <Link asChild href={`set/${props.set.id}`}>
+      <TouchableWithoutFeedback onPress={handleOpenModal}>
         <MoreVertical
           className="ml-auto"
           color="white"
           width={18}
           height={18}
         />
-      </Link>
+      </TouchableWithoutFeedback>
+      <EditSetHalfModal
+        id={props.set.id}
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+      />
     </TouchableOpacity>
   );
 }

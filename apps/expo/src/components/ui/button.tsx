@@ -6,6 +6,7 @@ import {
 } from "react-native";
 import { Link } from "expo-router";
 import { cva, type VariantProps } from "class-variance-authority";
+import type { LucideIcon } from "lucide-react-native";
 
 import { cn } from "~/utils/cn";
 
@@ -41,7 +42,7 @@ const buttonVariants = cva<ButtonVariants>("rounded items-center", {
   },
 });
 
-const textVariants = cva<ButtonVariants>("font-bold", {
+const textVariants = cva<ButtonVariants>("font-bold inline-flex", {
   variants: {
     variant: {
       primary: "text-slate-950",
@@ -60,10 +61,6 @@ const textVariants = cva<ButtonVariants>("font-bold", {
   },
 });
 
-type ButtonProps = TouchableOpacityProps &
-  VariantProps<typeof buttonVariants> &
-  (DefaultButtonProps | LinkButtonProps);
-
 type DefaultButtonProps = {
   asLink?: false;
   href?: never;
@@ -74,6 +71,13 @@ type LinkButtonProps = {
   href: string;
 };
 
+type ButtonProps = TouchableOpacityProps &
+  VariantProps<typeof buttonVariants> &
+  (DefaultButtonProps | LinkButtonProps) & {
+    startIcon?: LucideIcon;
+    endIcon?: LucideIcon;
+  };
+
 export function Button(props: ButtonProps) {
   const {
     children,
@@ -82,6 +86,8 @@ export function Button(props: ButtonProps) {
     asLink,
     href,
     className,
+    endIcon: EndIcon,
+    startIcon: StartIcon,
     ...touchableOpacityProps
   } = props;
 
@@ -90,9 +96,17 @@ export function Button(props: ButtonProps) {
       <Link href={href} asChild>
         <Pressable className={cn(className, buttonVariants({ variant, size }))}>
           {() => (
-            <Text className={cn(textVariants({ variant, size }))}>
-              {children}
-            </Text>
+            <>
+              {StartIcon && (
+                <StartIcon className={cn(textVariants({ variant, size }))} />
+              )}
+              <Text className={cn(textVariants({ variant, size }))}>
+                {children}
+              </Text>
+              {EndIcon && (
+                <EndIcon className={cn(textVariants({ variant, size }))} />
+              )}
+            </>
           )}
         </Pressable>
       </Link>

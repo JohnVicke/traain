@@ -4,6 +4,7 @@ import {
   View,
   type TextInputProps,
 } from "react-native";
+import { cva, type VariantProps } from "class-variance-authority";
 import {
   Controller,
   type Control,
@@ -12,19 +13,51 @@ import {
   type RegisterOptions,
 } from "react-hook-form";
 
-type TextInputFieldProps<T extends FieldValues> = TextInputProps & {
-  control: Control<T>;
-  name: Path<T>;
-  rules?: Omit<
-    RegisterOptions<T, Path<T>>,
-    "valueAsNumber" | "valueAsDate" | "setValueAs" | "disabled"
-  >;
+type TextInputFieldVariants = {
+  variant: {
+    filled: string;
+    ghost: string;
+  };
 };
+
+const textInputFieldVariants = cva<TextInputFieldVariants>(
+  "rounded p-2 text-white",
+  {
+    variants: {
+      variant: {
+        filled: "bg-white/10",
+        ghost: "bg-transparent",
+      },
+    },
+    defaultVariants: {
+      variant: "filled",
+    },
+  },
+);
+
+type TextInputFieldProps<T extends FieldValues> = TextInputProps &
+  VariantProps<typeof textInputFieldVariants> & {
+    className?: string;
+    control: Control<T>;
+    name: Path<T>;
+    rules?: Omit<
+      RegisterOptions<T, Path<T>>,
+      "valueAsNumber" | "valueAsDate" | "setValueAs" | "disabled"
+    >;
+  };
 
 export function TextInputField<T extends FieldValues>(
   props: TextInputFieldProps<T>,
 ) {
-  const { control, name, rules, ...textFieldProps } = props;
+  const {
+    control,
+    variant,
+    onBlur: passedOnBlur,
+    name,
+    rules,
+    className,
+    ...textFieldProps
+  } = props;
   return (
     <Controller
       control={control}
@@ -36,11 +69,11 @@ export function TextInputField<T extends FieldValues>(
       }) => (
         <View>
           <RNTextInput
-            className="rounded bg-white/10 p-2 text-white"
+            className={textInputFieldVariants({ variant, className })}
             {...textFieldProps}
             placeholderTextColor="rgba(255, 255, 255, 0.5)"
             onChangeText={onChange}
-            onBlur={onBlur}
+            onBlur={passedOnBlur || onBlur}
             value={value}
           />
           {!!error && (

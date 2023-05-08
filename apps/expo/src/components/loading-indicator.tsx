@@ -10,7 +10,6 @@ export function LoadingIndicator(props: { size: number }) {
         loop: true,
       }}
       style={{
-        backgroundColor: "#fff",
         borderColor: "#99f6e4",
         shadowColor: "#fff",
         shadowOffset: { width: 0, height: 0 },

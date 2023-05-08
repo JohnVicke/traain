@@ -1,14 +1,15 @@
 import { useState } from "react";
 import { Text, TextInput, TouchableOpacity, View } from "react-native";
-import { useRouter } from "expo-router";
 import { FlashList } from "@shopify/flash-list";
 import { MoreVertical, PlusSquare } from "lucide-react-native";
 import { MotiView } from "moti";
+import { useForm } from "react-hook-form";
 
 import { type RouterOutputs } from "@traain/api";
 
 import { api } from "~/utils/api";
 import { KeyboardAvoidView } from "~/components/keyboard-avoid-view";
+import { TextInputField } from "~/components/ui/text-inputfield";
 import EditSetHalfModal from "./edit-set-half-modal";
 
 type WorkoutOutput = RouterOutputs["workout"]["get"];
@@ -63,15 +64,17 @@ function ExerciseCard(props: ExerciseCardProps) {
         {exercise.exercise.name}
       </Text>
       <View className="my-3 h-px w-full bg-slate-500/50" />
-      <View className="flex">
+      <MotiView className="flex">
         {exercise.sets.map((set, index) => (
-          <SetRow
+          <MotiView
+            from={{ translateY: -10, opacity: 0 }}
+            animate={{ translateY: 0, opacity: 1 }}
             key={`set-${index}-row-${exercise.id}-${exercise.exercise.id}`}
-            index={index}
-            set={set}
-          />
+          >
+            <SetRow index={index} set={set} />
+          </MotiView>
         ))}
-      </View>
+      </MotiView>
       <View className="my-3 h-px w-full bg-slate-500/50" />
       <TouchableOpacity
         onPress={() => handleAddSet(exercise.id)}
@@ -84,24 +87,53 @@ function ExerciseCard(props: ExerciseCardProps) {
   );
 }
 
+type SetForm = {
+  weight: string;
+  reps: string;
+  notes: string;
+};
+
 type SetRowProps = {
   index: number;
   set: WorkoutOutput["exercises"][number]["sets"][number];
 };
 
 function SetRow(props: SetRowProps) {
+  const utils = api.useContext();
+
+  const { mutate } = api.set.update.useMutation({
+    onSuccess: () => {
+      void utils.workout.get.invalidate();
+    },
+  });
+
   const [modalOpen, setModalOpen] = useState(false);
-  const router = useRouter();
+
+  const { control, handleSubmit } = useForm<SetForm>({
+    defaultValues: {
+      notes: props.set?.notes ?? undefined,
+      reps: props.set?.reps?.toString(),
+      weight: props.set?.weight?.toString(),
+    },
+  });
 
   const handleOpenModal = () => {
     setModalOpen(true);
   };
 
+  const updateSet = handleSubmit((data) => {
+    console.log({ data });
+    mutate({
+      id: props.set.id,
+      reps: data.reps ? +data.reps : undefined,
+      weight: data.weight ? +data.weight : undefined,
+      notes: data.notes,
+    });
+  });
+
   return (
     <TouchableOpacity
-      onLongPress={() => {
-        router.push(`/workout/set/${props.set.id}`);
-      }}
+      onLongPress={() => handleOpenModal()}
       className="mb-2 flex flex-row items-center"
     >
       <View className="relative h-6 w-6 items-center justify-center rounded-full bg-slate-500/50 p-2">
@@ -111,28 +143,37 @@ function SetRow(props: SetRowProps) {
       </View>
       <View className="ml-4 flex min-w-[50px]">
         <Text className="text-[10px] text-slate-400">Weight</Text>
-        <TextInput
+        <TextInputField
+          onBlur={() => void updateSet()}
+          variant="ghost"
+          control={control}
+          name="weight"
           placeholder="0"
-          placeholderTextColor="rgba(255, 255, 255, 0.5)"
-          className="rounded p-1 font-bold text-white"
+          className="p-1 font-bold"
           keyboardType="number-pad"
         />
       </View>
       <View className="ml-2 flex min-w-[50px]">
         <Text className="text-[10px] text-slate-400">Reps</Text>
-        <TextInput
+        <TextInputField
+          onBlur={() => void updateSet()}
+          variant="ghost"
+          control={control}
+          name="reps"
           placeholder="0"
-          placeholderTextColor="rgba(255, 255, 255, 0.5)"
-          className="rounded p-1 font-bold text-white"
+          className="p-1 font-bold"
           keyboardType="number-pad"
         />
       </View>
       <View className="ml-2 flex min-w-[50px]">
         <Text className="text-[10px] text-slate-400">Notes</Text>
-        <TextInput
+        <TextInputField
+          onBlur={() => void updateSet()}
+          variant="ghost"
+          control={control}
+          name="notes"
           placeholder={props.set.notes ?? "Add a note..."}
-          placeholderTextColor="rgba(255, 255, 255, 0.5)"
-          className="rounded p-1 text-white"
+          className="rounded p-1"
           keyboardType="default"
         />
       </View>

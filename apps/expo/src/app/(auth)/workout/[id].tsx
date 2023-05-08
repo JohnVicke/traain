@@ -1,5 +1,5 @@
 import { Text, View } from "react-native";
-import { useLocalSearchParams } from "expo-router";
+import { Stack, useLocalSearchParams } from "expo-router";
 import { SafeAreaView } from "moti";
 
 import { api } from "~/utils/api";
@@ -34,6 +34,7 @@ export default function Workout() {
 
   return (
     <SafeAreaView className="px-2 pt-8">
+      <Stack.Screen options={{ headerShown: true }} />
       <WorkoutList workout={data} />
     </SafeAreaView>
   );

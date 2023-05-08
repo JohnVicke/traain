@@ -1,18 +1,19 @@
 import { Text, View } from "react-native";
-import { useSearchParams } from "expo-router";
+import { useLocalSearchParams } from "expo-router";
+import { SafeAreaView } from "moti";
 
 import { api } from "~/utils/api";
 import { LoadingIndicator } from "~/components/loading-indicator";
 import { WorkoutList } from "~/modules/workout/workout-list";
 
-const asString = (param?: string | string[]) =>
+const paramAsString = (param?: string | string[]) =>
   typeof param === "string" ? param : "";
 
 export default function Workout() {
-  const { id } = useSearchParams();
+  const { id } = useLocalSearchParams<{ id: string }>();
 
   const { data, error, isLoading } = api.workout.get.useQuery({
-    id: asString(id),
+    id: paramAsString(id),
   });
 
   if (isLoading) {
@@ -32,8 +33,8 @@ export default function Workout() {
   }
 
   return (
-    <View className="bg-slate-900 px-2 pt-8">
+    <SafeAreaView className="px-2 pt-8">
       <WorkoutList workout={data} />
-    </View>
+    </SafeAreaView>
   );
 }

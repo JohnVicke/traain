@@ -24,7 +24,7 @@ export default function Workouts() {
   }
 
   return (
-    <View className="flex h-full bg-slate-900 px-4 pt-24">
+    <View className="flex h-full px-4 pt-24">
       {data.map((workout) => (
         <Button key={workout.id} asLink href={`/workout/${workout.id}`}>
           Go to workout: {workout.id}

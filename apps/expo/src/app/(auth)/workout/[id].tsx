@@ -5,10 +5,15 @@ import { api } from "~/utils/api";
 import { LoadingIndicator } from "~/components/loading-indicator";
 import { WorkoutList } from "~/modules/workout/workout-list";
 
+const asString = (param?: string | string[]) =>
+  typeof param === "string" ? param : "";
+
 export default function Workout() {
   const { id } = useSearchParams();
 
-  const { data, error, isLoading } = api.workout.get.useQuery({ id });
+  const { data, error, isLoading } = api.workout.get.useQuery({
+    id: asString(id),
+  });
 
   if (isLoading) {
     return (

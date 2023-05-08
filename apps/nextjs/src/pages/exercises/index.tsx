@@ -15,7 +15,7 @@ export default function Page() {
   return (
     <div>
       {data.map((exercise) => (
-        <div>{JSON.stringify(exercise)}</div>
+        <div key={exercise.id}>{JSON.stringify(exercise)}</div>
       ))}
     </div>
   );

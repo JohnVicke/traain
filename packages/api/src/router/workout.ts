@@ -1,12 +1,7 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
-import {
-  type Exercise,
-  type MuscleGroup,
-  type WorkoutExercise,
-  type prisma,
-} from "@traain/db";
+import { type MuscleGroup, type prisma } from "@traain/db";
 import { type OpenAiClient } from "@traain/openai-client";
 import { createOpenAiClient } from "@traain/openai-client/src/openai-client";
 
@@ -18,7 +13,7 @@ import { exampleWorkout } from "./example-workout";
 const aiClient = createOpenAiClient();
 
 export const workoutRouter = createTRPCRouter({
-  create: protectedProcedure.mutation(async ({ ctx }) => {
+  create: protectedProcedure.mutation(() => {
     return "hello world";
   }),
   getAll: protectedProcedure.query(async ({ ctx }) => {
@@ -61,7 +56,7 @@ export const workoutRouter = createTRPCRouter({
           enrichExercise(e, res.find((ex) => ex.name === e.name)?.id ?? ""),
         );
 
-        const workout = await createWorkout({
+        await createWorkout({
           db: ctx.prisma,
           exercises: enrichedExercises,
           userId: ctx.auth.userId,
@@ -162,7 +157,7 @@ async function createExercisesIfNotExists(
     muscleGroupMap.set(muscleGroup.name, muscleGroup);
   }
 
-  const exerciseCreates = exercises.map(async (exercise, index) => {
+  const exerciseCreates = exercises.map(async (exercise) => {
     const muscleGroupIds = exercise.muscleGroups.map(
       (mgName) => muscleGroupMap.get(mgName)?.id,
     );

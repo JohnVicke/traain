@@ -1,13 +1,7 @@
 import React from "react";
-import { Pressable } from "react-native";
 import { Link, Tabs, usePathname } from "expo-router";
-import {
-  Dumbbell,
-  History,
-  LineChart,
-  type LucideIcon,
-} from "lucide-react-native";
-import { AnimatePresence, MotiView, Text } from "moti";
+import { Dumbbell, LineChart, type LucideIcon } from "lucide-react-native";
+import { MotiView } from "moti";
 import { MotiPressable } from "moti/interactions";
 
 import { cn } from "~/utils/cn";

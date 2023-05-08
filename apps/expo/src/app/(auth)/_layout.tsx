@@ -1,6 +1,12 @@
 import React from "react";
 import { Link, Tabs, usePathname } from "expo-router";
-import { Dumbbell, LineChart, type LucideIcon } from "lucide-react-native";
+import {
+  Cog,
+  Dumbbell,
+  History,
+  LineChart,
+  type LucideIcon,
+} from "lucide-react-native";
 import { MotiView } from "moti";
 import { MotiPressable } from "moti/interactions";
 
@@ -54,14 +60,18 @@ export default function Layout() {
       tabBar={(props) => <TabBar {...props} pathname={pathname} />}
       screenOptions={{ headerShown: false }}
     >
-      <Tabs.Screen name="workout" />
-      <Tabs.Screen name="statistics" />
-      <Tabs.Screen name="generate" />
+      {navItems.map(({ href }) => (
+        <Tabs.Screen key={`tab-scren-${href}`} name={href.slice(1)} />
+      ))}
     </Tabs>
   );
 }
 
 const navItems = [
+  {
+    href: "/history",
+    icon: History,
+  },
   {
     href: "/workout",
     icon: Dumbbell,
@@ -71,7 +81,7 @@ const navItems = [
     icon: LineChart,
   },
   {
-    href: "/generate",
-    icon: LineChart,
+    href: "/settings",
+    icon: Cog,
   },
 ] satisfies Partial<NavItem>[];

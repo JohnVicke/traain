@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { Text, TouchableOpacity, View, type Animated } from "react-native";
-import { Swipeable } from "react-native-gesture-handler";
+import { Animated, Text, TouchableOpacity, View } from "react-native";
+import { RectButton, Swipeable } from "react-native-gesture-handler";
+import Test from "react-native-reanimated";
 import { FlashList } from "@shopify/flash-list";
 import { MoreVertical, PlusSquare, Trash } from "lucide-react-native";
-import { AnimatePresence, MotiView } from "moti";
+import { MotiView } from "moti";
 import { useForm } from "react-hook-form";
 
 import { type RouterOutputs } from "@traain/api";
@@ -123,7 +124,6 @@ function SetRow(props: SetRowProps) {
   };
 
   const updateSet = handleSubmit((data) => {
-    console.log({ data });
     mutate({
       id: props.set.id,
       reps: data.reps ? +data.reps : undefined,
@@ -199,14 +199,22 @@ const RightActions = (props: {
   dragX: Animated.AnimatedInterpolation<string | number>;
 }) => {
   const { progress, dragX } = props;
+  const translateX = dragX.interpolate({
+    inputRange: [0, 100],
+    outputRange: [0, 100],
+  });
+
   return (
-    <MotiView
-      from={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      className="flex flex-row items-center space-x-2 bg-red-400"
+    <RectButton
+      style={{
+        alignItems: "center",
+        backgroundColor: "#497AFC",
+        justifyContent: "center",
+      }}
     >
-      <Trash className="text-slate-800" />
-      <Text>Delete</Text>
-    </MotiView>
+      <Animated.Text style={{ transform: [{ translateX }] }}>
+        Delete
+      </Animated.Text>
+    </RectButton>
   );
 };
